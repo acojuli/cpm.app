@@ -46,7 +46,12 @@ export const LoginHistory = () => {
   }, [dispatch])
 
   return (
-    <Grid md={12} xs={12} margin='16px 0px 16px 32px'>
+    <Grid
+      item
+      md={12}
+      xs={12}
+      margin='16px 0px 16px 32px'
+    >
       <Card>
         <CardHeader style={{ paddingLeft:'40px'}} title="Historial de ingresos" />
         <CardContent style={{ padding: 0 }}>
@@ -65,12 +70,12 @@ export const LoginHistory = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {Array.isArray(accessLogs?.data) ? (
-                  accessLogs?.data?.map(r => (
+                {accessLogs?.data && accessLogs.data.length > 0 ? (
+                  accessLogs.data.map((r) => (
                     <TableRow key={r.id}>
-                      <StyledTableCell style={{ paddingLeft:'16px'}}>{r.createdAt}</StyledTableCell>
+                      <StyledTableCell style={{ paddingLeft: '16px' }}>{r.createdAt}</StyledTableCell>
                       <StyledTableCell>{r.ip}</StyledTableCell>
-                      <StyledTableCell>{r.device.substring(0,80)}</StyledTableCell>
+                      <StyledTableCell>{r.device.substring(0, 80)}</StyledTableCell>
                     </TableRow>
                   ))
                 ) : (

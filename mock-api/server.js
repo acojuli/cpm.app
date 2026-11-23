@@ -439,7 +439,40 @@ const handleRequest = async (req, res) => {
   // --- Datos que consume el dashboard (respuestas vacías) ---------------
 
   if (path === "/orders" && method === "GET") {
-    send(res, 200, { data: [] });
+    send(res, 200, {
+      data: [
+        {
+          id: "1",
+          amount: 500,
+          type: "inversion",
+          status: "approved",
+          fund: { id: "1", name: "Fondo CPM" },
+          createdAt: "2026-11-02T14:30:00.000Z",
+          updatedAt: "2026-11-02T14:30:00.000Z",
+        },
+        {
+          id: "2",
+          amount: 250,
+          type: "buy",
+          status: "approved",
+          fund: { id: "2", name: "Fondo Bitcoin" },
+          createdAt: "2026-11-10T09:15:00.000Z",
+          updatedAt: "2026-11-10T09:15:00.000Z",
+        },
+        {
+          id: "3",
+          amount: 120,
+          type: "withdrawal",
+          status: "pending",
+          fund: null,
+          createdAt: "2026-11-18T18:45:00.000Z",
+          updatedAt: "2026-11-18T18:45:00.000Z",
+        },
+      ],
+      page: 1,
+      per_page: 5,
+      total: 3,
+    });
     return;
   }
 
@@ -448,8 +481,51 @@ const handleRequest = async (req, res) => {
     return;
   }
 
+  // Serie diaria para los gráficos de performance.
+  if (path.startsWith("/funds/") && path.endsWith("/perform") && method === "GET") {
+    const days = 10;
+    const today = new Date();
+
+    const data = Array.from({ length: days }).map((_, index) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() - (days - 1 - index));
+      const perform = Number((12 + Math.sin(index / 1.7) * 3 + index * 0.4).toFixed(2));
+      const time = date.getTime();
+
+      return {
+        label: date.toISOString(),
+        perform,
+        time,
+        token: "USDT",
+        performance: {
+          date: date.toISOString(),
+          percent: perform,
+          perform,
+          price: Number((1000 + index * 17.5).toFixed(2)),
+          time,
+          type: "daily",
+        },
+      };
+    });
+
+    send(res, 200, data);
+    return;
+  }
+
   if (path === "/users/access-log" && method === "GET") {
-    send(res, 200, { data: [] });
+    send(res, 200, {
+      data: [
+        {
+          id: 1,
+          createdAt: "2026-11-21T09:02:00.000Z",
+          ip: "127.0.0.1",
+          device: "Chrome en Windows (mock)",
+        },
+      ],
+      page: 1,
+      per_page: 100,
+      total: 1,
+    });
     return;
   }
 

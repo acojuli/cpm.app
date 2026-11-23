@@ -51,7 +51,12 @@ export const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 }));
 export const MultiFactorAuth = () => {
   return (
-    <Grid container xs={12} sm={12}>
+    <Grid
+      container
+      item
+      xs={12}
+      sm={12}
+    >
       <Grid
         container spacing={0} margin='16px 0 16px 32px' border='2px solid white' borderRadius='16px' padding='32px 48px 40px 42px'
         item
