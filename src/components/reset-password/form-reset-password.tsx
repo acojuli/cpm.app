@@ -9,6 +9,7 @@ import {
   import * as Yup from "yup";
   import { useFormik } from "formik";
   import ApiClient from "../../services/api-client";
+  import { toApiError } from "../../services/api-auth";
   import {
     errorNotification,
     succesNotification,
@@ -29,23 +30,21 @@ import {
           .required("Debes ingresar tu correo"),
       }),
       onSubmit: async (values, helpers): Promise<void> => {
-        const json = JSON.stringify(values);
         try {
-          await ApiClient.post("/auth/reset-password", json);
+          await ApiClient.post("/auth/reset-password", {
+            email: values.email,
+          });
           helpers.resetForm();
           dispatch(
             succesNotification({
-              msg: "Recibirás un correo para cambiar tu email",
+              msg: "Si el email está registrado, vas a recibir un correo para reiniciar tu contraseña",
               tab: "security",
             })
           );
         } catch (error) {
-          const msg = error?.response
-            ? error.response.data.error
-            : "Ha ocurrido un error";
           dispatch(
             errorNotification({
-              msg: msg,
+              msg: toApiError(error, "Ha ocurrido un error").message,
               tab: "security",
             })
           );

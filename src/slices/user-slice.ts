@@ -66,4 +66,4 @@ const slice = createSlice({
 });
 
 export const { reducer } = slice;
-export const { setUser } = slice.actions;
+export const { setUser, clearUser } = slice.actions;

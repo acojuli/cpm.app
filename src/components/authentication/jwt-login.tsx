@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/use-auth';
 import { useMounted } from '../../hooks/use-mounted';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { getSafeReturnUrl } from 'src/utils/safe-return-url';
 
 export const JWTLogin: FC = (props) => {
   const isMounted = useMounted();
@@ -35,7 +36,7 @@ export const JWTLogin: FC = (props) => {
         await login(values.email, values.password);
 
         if (isMounted()) {
-          const returnUrl = (router.query.returnUrl as string | undefined) || '/dashboard';
+          const returnUrl = getSafeReturnUrl(router.query.returnUrl);
           router.push(returnUrl).catch(console.error);
         }
       } catch (err) {

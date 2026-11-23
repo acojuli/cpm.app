@@ -21,6 +21,11 @@ import { useAuth } from "../../hooks/use-auth";
 import { useMounted } from "../../hooks/use-mounted";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Visibility from "@mui/icons-material/Visibility";
+import { getSafeReturnUrl } from "src/utils/safe-return-url";
+import {
+  PASSWORD_POLICY_MESSAGE,
+  PASSWORD_REGEX,
+} from "src/utils/password-policy";
 
 export const JWTRegister: FC = (props) => {
   const isMounted = useMounted();
@@ -29,7 +34,7 @@ export const JWTRegister: FC = (props) => {
   const [showPassword, setShowPassword] = useState(false);
   const formik = useFormik({
     initialValues: {
-      firstname: " ",
+      firstname: "",
       lastname: "",
       email: "",
       password: "",
@@ -38,21 +43,28 @@ export const JWTRegister: FC = (props) => {
       submit: null,
     },
     validationSchema: Yup.object({
+      firstname: Yup.string()
+        .trim()
+        .max(60, "El nombre es demasiado largo")
+        .required("Nombre es requerido"),
+      lastname: Yup.string()
+        .trim()
+        .max(60, "El apellido es demasiado largo")
+        .required("Apellido es requerido"),
       email: Yup.string()
+        .trim()
         .email("Debes ingresar un email valido")
         .max(255)
         .required("Email es requerido"),
       password: Yup.string()
-        .matches(
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@$!%*?&])([A-Za-z\d$#@$!%*?&]|[^ ]){10,15}$/,
-          "La contraseña debe incluir al menos 10 caracteres, una mayuscula, un numero y un simbolo"
-        )
-        .max(255)
+        .matches(PASSWORD_REGEX, PASSWORD_POLICY_MESSAGE)
         .required("Password es requerido"),
-      passwordConfirmation: Yup.string().oneOf(
-        [Yup.ref("password"), null],
-        "Debe ser igual a la contraseña"
-      ),
+      passwordConfirmation: Yup.string()
+        .required("Debes confirmar la contraseña")
+        .oneOf(
+          [Yup.ref("password"), null],
+          "Debe ser igual a la contraseña"
+        ),
       policy: Yup.boolean().oneOf(
         [true],
         "Debes aceptar los Terminos y condiciones"
@@ -60,11 +72,18 @@ export const JWTRegister: FC = (props) => {
     }),
     onSubmit: async (values, helpers): Promise<void> => {
       try {
-        await register(values.firstname, values.lastname, values.email, values.password);
+        await register(
+          values.firstname.trim(),
+          values.lastname.trim(),
+          values.email.trim(),
+          values.password
+        );
 
         if (isMounted()) {
-          const returnUrl =
-            (router.query.returnUrl as string | undefined) || "/email-verification";
+          const returnUrl = getSafeReturnUrl(
+            router.query.returnUrl,
+            "/email-verification"
+          );
           router.push(returnUrl).catch(console.error);
         }
       } catch (err) {

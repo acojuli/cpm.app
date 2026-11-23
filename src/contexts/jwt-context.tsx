@@ -1,11 +1,16 @@
-import { createContext, useEffect, useReducer } from "react";
+import { createContext, useCallback, useEffect, useReducer } from "react";
 import type { FC, ReactNode } from "react";
 import PropTypes from "prop-types";
 import { authApi } from "../services/api-auth";
-import { RegisterResponse } from "src/types/register";
+import { RegisterApiResponse } from "src/services/api-auth";
 import { useDispatch } from "../store/index";
-import { setUser } from "../slices/user-slice";
+import { clearUser, setUser } from "../slices/user-slice";
 import { User, UserDetail } from "../types/user-data";
+import {
+  ACCESS_TOKEN_KEY,
+  MOCK_VERIFICATION_TOKEN_KEY,
+} from "../services/api-config";
+import { UNAUTHORIZED_EVENT } from "../services/api-client";
 
 interface State {
   isInitialized: boolean;
@@ -17,7 +22,13 @@ export interface AuthContextValue extends State {
   platform: "JWT";
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (firstname: string, lastname:string, email: string, password: string) => Promise<void>;
+  register: (
+    firstname: string,
+    lastname: string,
+    email: string,
+    password: string
+  ) => Promise<void>;
+  refreshUser: () => Promise<UserDetail | null>;
 }
 
 interface AuthProviderProps {
@@ -29,6 +40,7 @@ enum ActionType {
   LOGIN = "LOGIN",
   LOGOUT = "LOGOUT",
   REGISTER = "REGISTER",
+  REFRESH = "REFRESH",
 }
 
 type InitializeAction = {
@@ -36,6 +48,7 @@ type InitializeAction = {
   payload: {
     isAuthenticated: boolean;
     user: UserDetail | null;
+    token?: string;
   };
 };
 
@@ -57,7 +70,19 @@ type RegisterAction = {
   };
 };
 
-type Action = InitializeAction | LoginAction | LogoutAction | RegisterAction;
+type RefreshAction = {
+  type: ActionType.REFRESH;
+  payload: {
+    user: UserDetail;
+  };
+};
+
+type Action =
+  | InitializeAction
+  | LoginAction
+  | LogoutAction
+  | RegisterAction
+  | RefreshAction;
 
 type Handler = (state: State, action: any) => State;
 
@@ -69,16 +94,13 @@ const initialState: State = {
 
 const handlers: Record<ActionType, Handler> = {
   INITIALIZE: (state: State, action: InitializeAction): State => {
-    const { isAuthenticated, user } = action.payload;
+    const { isAuthenticated, user, token = "" } = action.payload;
 
     return {
       ...state,
       isAuthenticated,
       isInitialized: true,
-      user: {
-        user: user,
-        token: "",
-      },
+      user: user ? { user, token } : null,
     };
   },
   LOGIN: (state: State, action: LoginAction): State => {
@@ -104,6 +126,14 @@ const handlers: Record<ActionType, Handler> = {
       user,
     };
   },
+  REFRESH: (state: State, action: RefreshAction): State => ({
+    ...state,
+    isAuthenticated: true,
+    user: {
+      user: action.payload.user,
+      token: state.user?.token || "",
+    },
+  }),
 };
 
 const reducer = (state: State, action: Action): State =>
@@ -115,36 +145,74 @@ export const AuthContext = createContext<AuthContextValue>({
   login: () => Promise.resolve(),
   logout: () => Promise.resolve(),
   register: () => Promise.resolve(),
+  refreshUser: () => Promise.resolve(null),
 });
 
 export const AuthProvider: FC<AuthProviderProps> = (props) => {
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
   const reduxDispatch = useDispatch();
+
+  const logout = useCallback(async (): Promise<void> => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(ACCESS_TOKEN_KEY);
+    }
+
+    reduxDispatch(clearUser());
+    dispatch({ type: ActionType.LOGOUT });
+  }, [reduxDispatch]);
+
+  // Si la API responde 401 con un token vencido, cerramos la sesión.
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const handleUnauthorized = () => {
+      void logout();
+    };
+
+    window.addEventListener(UNAUTHORIZED_EVENT, handleUnauthorized);
+
+    return () => {
+      window.removeEventListener(UNAUTHORIZED_EVENT, handleUnauthorized);
+    };
+  }, [logout]);
+
   useEffect(() => {
     const initialize = async (): Promise<void> => {
+      const accessToken =
+        typeof window !== "undefined"
+          ? window.localStorage.getItem(ACCESS_TOKEN_KEY)
+          : null;
+
+      if (!accessToken) {
+        dispatch({
+          type: ActionType.INITIALIZE,
+          payload: {
+            isAuthenticated: false,
+            user: null,
+          },
+        });
+        return;
+      }
+
       try {
-        const accessToken = globalThis.localStorage.getItem("accessToken");
-        if (accessToken) {
-          const user = await authApi.me();
-          reduxDispatch(setUser({ user: user, token: "accessToken" }));
-          dispatch({
-            type: ActionType.INITIALIZE,
-            payload: {
-              isAuthenticated: true,
-              user,
-            },
-          });
-        } else {
-          dispatch({
-            type: ActionType.INITIALIZE,
-            payload: {
-              isAuthenticated: false,
-              user: null,
-            },
-          });
-        }
+        const user = await authApi.me();
+        reduxDispatch(setUser({ user, token: accessToken }));
+        dispatch({
+          type: ActionType.INITIALIZE,
+          payload: {
+            isAuthenticated: true,
+            user,
+            token: accessToken,
+          },
+        });
       } catch (err) {
+        if (typeof window !== "undefined") {
+          window.localStorage.removeItem(ACCESS_TOKEN_KEY);
+        }
+        reduxDispatch(clearUser());
         dispatch({
           type: ActionType.INITIALIZE,
           payload: {
@@ -156,23 +224,23 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
     };
 
     initialize();
+    // `reduxDispatch` es estable; solo debe correr al montar el provider.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
     const userData: User = await authApi.login({ email, password });
-    const { token } = userData;
 
-    localStorage.setItem("accessToken", token);
+    if (!userData?.token) {
+      throw new Error("La respuesta del servidor no incluyó un token");
+    }
+
+    localStorage.setItem(ACCESS_TOKEN_KEY, userData.token);
     reduxDispatch(setUser(userData));
     dispatch({
       type: ActionType.LOGIN,
       payload: { user: userData },
     });
-  };
-
-  const logout = async (): Promise<void> => {
-    localStorage.removeItem("accessToken");
-    dispatch({ type: ActionType.LOGOUT });
   };
 
   const register = async (
@@ -181,25 +249,63 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
     email: string,
     password: string
   ): Promise<void> => {
-    const registerResponse: RegisterResponse = await authApi.register({
+    const registerResponse: RegisterApiResponse = await authApi.register({
       firstname,
       lastname,
       email,
       password,
     });
 
-    if (registerResponse) {
-      const { token, user } = await authApi.login({ email, password });
-      localStorage.setItem("accessToken", token);
-
-      dispatch({
-        type: ActionType.REGISTER,
-        payload: {
-          user: { user, token: token },
-        },
-      });
+    if (!registerResponse) {
+      throw new Error("No se pudo crear la cuenta");
     }
+
+    // Solo en desarrollo: guardamos el token que devuelve el mock para
+    // mostrarlo en la pantalla de verificación (la API real no lo devuelve).
+    if (
+      registerResponse.mock_verification_token &&
+      typeof window !== "undefined"
+    ) {
+      window.sessionStorage.setItem(
+        MOCK_VERIFICATION_TOKEN_KEY,
+        registerResponse.mock_verification_token
+      );
+    }
+
+    // Registro exitoso: iniciamos sesión automáticamente.
+    const userData: User = await authApi.login({ email, password });
+
+    if (!userData?.token) {
+      throw new Error("La cuenta se creó pero no se pudo iniciar sesión");
+    }
+
+    localStorage.setItem(ACCESS_TOKEN_KEY, userData.token);
+    reduxDispatch(setUser(userData));
+    dispatch({
+      type: ActionType.REGISTER,
+      payload: { user: userData },
+    });
   };
+
+  const refreshUser = useCallback(async (): Promise<UserDetail | null> => {
+    const accessToken =
+      typeof window !== "undefined"
+        ? window.localStorage.getItem(ACCESS_TOKEN_KEY)
+        : null;
+
+    if (!accessToken) {
+      return null;
+    }
+
+    const user = await authApi.me();
+    reduxDispatch(setUser({ user, token: accessToken }));
+    dispatch({
+      type: ActionType.REFRESH,
+      payload: { user },
+    });
+
+    return user;
+  }, [reduxDispatch]);
 
   return (
     <AuthContext.Provider
@@ -209,6 +315,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
         login,
         logout,
         register,
+        refreshUser,
       }}
     >
       {children}

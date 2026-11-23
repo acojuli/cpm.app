@@ -14,7 +14,7 @@ type Platform = 'Amplify' | 'Auth0' | 'Firebase' | 'JWT';
 const Register: NextPage = () => {
   const router = useRouter();
   const { platform }: { platform: Platform } = useAuth();
-  const { disableGuard } = router.query;
+  const returnUrl = router.query.returnUrl as string | undefined;
 
   return (
     <>
@@ -92,11 +92,10 @@ const Register: NextPage = () => {
             >
             Ya estas registrado? {' '}
               <NextLink
-                href={
-                  disableGuard
-                    ? `/login?disableGuard=${disableGuard}`
-                    : '/login'
-                }
+                href={{
+                  pathname: '/login',
+                  query: returnUrl ? { returnUrl } : undefined
+                }}
                 passHref
               >
                 <Link

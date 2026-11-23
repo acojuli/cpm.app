@@ -14,6 +14,11 @@ import {
 import { useDispatch } from "src/store";
 import { FC } from "react";
 import ApiClient from "src/services/api-client";
+import { toApiError } from "src/services/api-auth";
+import {
+  PASSWORD_POLICY_MESSAGE,
+  PASSWORD_REGEX,
+} from "src/utils/password-policy";
 
 interface Props {
   token?: string;
@@ -29,27 +34,23 @@ export const FormResetPassword: FC<Props> = ({ token, redirect }) => {
     },
     validationSchema: Yup.object({
       password: Yup.string()
-        .min(8, "La constraseña es muy corta")
-        .required("Debes ingresar la nueva contraseña")
-        .matches(
-          /(?=^.{8,20}$)(?=.*\d)(?=.*[!@#$.]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,
-          "La contraseña debe contener: 1 letra mayuscula, 1 letra minuscula, 1 caracter especial (!@#$.) y 1 numero"
-        ),
+        .matches(PASSWORD_REGEX, PASSWORD_POLICY_MESSAGE)
+        .required("Debes ingresar la nueva contraseña"),
       password_confirm: Yup.string()
-        .min(8, "La constraseña es muy corta")
         .required("Debes confirmar la nueva contraseña")
-        .matches(
-          /(?=^.{8,20}$)(?=.*\d)(?=.*[!@#$.]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,
-          "La contraseña debe contener: 1 letra mayuscula, 1 letra minuscula, 1 caracter especial (!@#$.) y 1 numero"
-        ),
+        .oneOf([Yup.ref("password"), null], "Las contraseñas deben coincidir"),
     }),
     onSubmit: async (values, helpers): Promise<void> => {
-      const json = JSON.stringify(values);
       try {
+        const payload = {
+          password: values.password,
+          password_confirm: values.password_confirm,
+        };
+
         if (token) {
-          await ApiClient.postWithToken("/users/reset-password", json, token);
+          await ApiClient.postWithToken("/users/reset-password", payload, token);
         } else {
-          await ApiClient.post("/users/reset-password", json);
+          await ApiClient.post("/users/reset-password", payload);
         }
 
         helpers.resetForm();
@@ -63,7 +64,10 @@ export const FormResetPassword: FC<Props> = ({ token, redirect }) => {
       } catch (error) {
         dispatch(
           errorNotification({
-            msg: "No se pudo realizar el cambio de contraseña",
+            msg: toApiError(
+              error,
+              "No se pudo realizar el cambio de contraseña"
+            ).message,
             tab: "security",
           })
         );

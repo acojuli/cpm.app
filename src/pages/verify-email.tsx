@@ -1,59 +1,134 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import request from 'src/services/api-client';
-import axios from 'axios';
-import { RootState, useSelector } from 'src/store';
+import { Box, Button, CircularProgress, Container, Typography } from '@mui/material';
+import { useAuth } from 'src/hooks/use-auth';
+import { authApi, toApiError } from 'src/services/api-auth';
+import { getSafeReturnUrl } from 'src/utils/safe-return-url';
+import { MOCK_VERIFICATION_TOKEN_KEY } from 'src/services/api-config';
 
-interface ApiResponseType {
-  active: boolean;
-  message?: string;
-}
+type VerificationStatus = 'loading' | 'success' | 'error';
 
 export default function VerifyEmailPage() {
-  const user = useSelector((state: RootState) => state.user.userData.user);
+  const { isInitialized, isAuthenticated, refreshUser } = useAuth();
   const router = useRouter();
-  const [verificationStatus, setVerificationStatus] = useState<string>('');
+  const [status, setStatus] = useState<VerificationStatus>('loading');
+  const [message, setMessage] = useState<string>('Verificando tu email...');
 
   useEffect(() => {
-    if (!router.isReady) return;
+    if (!router.isReady || !isInitialized) {
+      return undefined;
+    }
 
     const token = router.query.token;
 
-    if (typeof token !== 'string') {
-      setVerificationStatus('Token no proporcionado o inválido.');
-      return;
+    if (typeof token !== 'string' || !token) {
+      setStatus('error');
+      setMessage('Token no proporcionado o inválido.');
+      return undefined;
     }
 
-    const verifyEmail = async (token: string) => {
+    let cancelled = false;
+
+    const verifyEmail = async (verificationToken: string) => {
       try {
-        const body = JSON.stringify({ token });
+        const data = await authApi.verifyEmail(verificationToken);
 
-        const response = await request.postWithToken('/users/verify-email', body, token);
+        if (cancelled) {
+          return;
+        }
 
-        const data: ApiResponseType = await response.data;
+        if (!data.active) {
+          setStatus('error');
+          setMessage(
+            data.message ||
+              'Error en la verificación. El token puede ser inválido o haber expirado.'
+          );
+          return;
+        }
 
-        if (data.active) {
-          router.push('/dashboard');
+        setStatus('success');
+        setMessage('¡Email verificado correctamente!');
+
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.removeItem(MOCK_VERIFICATION_TOKEN_KEY);
+        }
+
+        if (isAuthenticated) {
+          try {
+            await refreshUser();
+          } catch (refreshError) {
+            // La verificación ya fue exitosa; si falla el refresco, el guard
+            // volverá a consultar el usuario al navegar.
+          }
+
+          if (!cancelled) {
+            const returnUrl = getSafeReturnUrl(router.query.returnUrl);
+            router.replace(returnUrl).catch(console.error);
+          }
         } else {
-          setVerificationStatus(data.message || 'Error en la verificación. El token puede ser inválido o haber expirado.');
+          router
+            .replace({ pathname: '/login', query: { verified: '1' } })
+            .catch(console.error);
         }
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          const message = error.response?.data.message || 'Error al verificar el correo electrónico. Intenta de nuevo más tarde.';
-          setVerificationStatus(message);
-        } else {
-          setVerificationStatus('Error al verificar el correo electrónico. Intenta de nuevo más tarde.');
+        if (cancelled) {
+          return;
         }
+
+        setStatus('error');
+        setMessage(
+          toApiError(
+            error,
+            'Error al verificar el correo electrónico. Intenta de nuevo más tarde.'
+          ).message
+        );
       }
     };
 
     verifyEmail(token);
-  }, [router.isReady, router.query.token]);
+
+    return () => {
+      cancelled = true;
+    };
+    // `refreshUser` es estable (useCallback).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    router.isReady,
+    router.query.token,
+    router.query.returnUrl,
+    isInitialized,
+    isAuthenticated,
+  ]);
 
   return (
-    <div>
-      <h1>Verificación de Email</h1>
-      <p>{verificationStatus}</p>
-    </div>
+    <Container maxWidth="sm">
+      <Box
+        sx={{
+          alignItems: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '60vh',
+          justifyContent: 'center',
+          textAlign: 'center',
+          gap: 2,
+        }}
+      >
+        <Typography variant="h4" component="h1">
+          Verificación de email
+        </Typography>
+
+        {status === 'loading' && <CircularProgress />}
+
+        <Typography color={status === 'error' ? 'error' : 'textSecondary'}>
+          {message}
+        </Typography>
+
+        {status === 'error' && (
+          <Button variant="contained" onClick={() => router.push('/login')}>
+            Volver al login
+          </Button>
+        )}
+      </Box>
+    </Container>
   );
 }
