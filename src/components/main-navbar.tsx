@@ -49,7 +49,24 @@ export const MainNavbar: FC<MainNavbarProps> = (props) => {
             </a>
           </NextLink>
           <Box sx={{ flexGrow: 1 }} />
+          <Button
+            component="a"
+            href="/login"
+            size="small"
+            sx={{
+              mr: 1.5,
+              display: {
+                md: 'none',
+                sm: 'inline-flex',
+                xs: 'none'
+              }
+            }}
+            variant="contained"
+          >
+            Ingresar
+          </Button>
           <IconButton
+            aria-label="Abrir menú"
             color="primary"
             onClick={onOpenSidebar}
             sx={{
