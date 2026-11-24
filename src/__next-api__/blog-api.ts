@@ -9,7 +9,7 @@ class BlogApi {
       {
         id: '24b76cac9a128cd949747080',
         author: {
-          avatar: '/static/mock-images/avatars/avatar-jie_yan_song.png',
+          avatar: '',
           name: 'Mauricio Luduenia'
         },
         category: 'Criptomonedas',
@@ -22,7 +22,7 @@ class BlogApi {
       {
         id: 'a9c19d0caf2ca91020aacd1f',
         author: {
-          avatar: '/static/mock-images/avatars/avatar-omar_darboe.png',
+          avatar: '',
           name: 'CPM'
         },
         category: 'Criptomonedas',
@@ -41,7 +41,7 @@ class BlogApi {
     const post: Post = {
       id: '24b76cac9a128cd949747080',
       author: {
-        avatar: '/static/mock-images/avatars/avatar-jie_yan_song.png',
+        avatar: '',
         name: 'CPM'
       },
       category: 'Criptomonedas',

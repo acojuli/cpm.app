@@ -1,73 +1,83 @@
 import {
   Button,
   Card,
-  CardMedia,
   Grid,
   Stack,
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import { styled } from "@mui/material/styles";
 import { Plan } from "src/types/plan";
 import NextLink from "next/link";
-import { useSelector } from "react-redux";
-import { RootState } from "src/store";
 import { FC } from "react";
 import Performance from "../indices/performance";
+
 interface Props {
-  plan: Plan
+  plan: Plan;
 }
-interface MediaWrapperProps {
-  isMobile: boolean;
-}
-const BlogPostCardMediaWrapper = styled("div")<MediaWrapperProps>(({ isMobile }) => ({
-  height: isMobile ? "300px" : "100%",
-  position: "relative",
-}));
 
 export const CardPlan: FC<Props> = ({ plan }: Props) => {
-  const isMobile = useSelector((state: RootState) => state.mobile.isMobile);
   return (
-    <div>
-      {isMobile ? (
+    <Grid
+      item
+      xs={12}
+      lg={9}
+    >
+      <Card
+        sx={{
+          backgroundColor: "#1c1c1c",
+          border: "1px solid rgba(245, 250, 255, 0.18)",
+          borderRadius: "16px",
+          height: "100%",
+          overflow: "hidden",
+        }}
+      >
         <Grid
-          item
-          md={4}
-          xs={12}
+          container
+          sx={{ height: "100%" }}
         >
-          <Card
-            sx={{
-              height: "100%",
-              backgroundColor: "#1c1c1c",
-              border: "thin white solid"
-            }}
+          <Grid
+            item
+            xs={12}
+            md={5}
           >
-            <BlogPostCardMediaWrapper isMobile={isMobile}>
-              <CardMedia
-                image={plan.cover}
+            <Box
+              sx={{
+                height: { xs: 220, md: "100%" },
+                minHeight: { md: 400 },
+                position: "relative",
+              }}
+            >
+              <Box
+                component="img"
+                src={plan.cover}
+                alt={plan.title}
                 sx={{
                   height: "100%",
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: "100%",
-                  borderRadius: "16px 0 0 16px",
+                  inset: 0,
                   objectFit: "cover",
-                  objectPosition: "center center"
-              }}
+                  objectPosition: "center",
+                  position: "absolute",
+                  width: "100%",
+                }}
               />
-            </BlogPostCardMediaWrapper>
-            <Box sx={{ mt: 2, p: 2 }}>
+            </Box>
+          </Grid>
+
+          <Grid
+            item
+            xs={12}
+            md={7}
+          >
+            <Box sx={{ p: { xs: 2, md: 3 } }}>
               <Typography variant="h5">{plan.title}</Typography>
               <Typography
                 color="textSecondary"
                 sx={{
+                  WebkitBoxOrient: "vertical",
+                  WebkitLineClamp: 3,
                   mt: 1,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  WebkitBoxOrient: "vertical",
-                  WebkitLineClamp: 2,
                 }}
                 variant="body1"
               >
@@ -76,161 +86,61 @@ export const CardPlan: FC<Props> = ({ plan }: Props) => {
               <Typography
                 color="textSecondary"
                 sx={{
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
                   WebkitBoxOrient: "vertical",
                   WebkitLineClamp: 2,
+                  mt: 1,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}
                 variant="body1"
               >
                 {plan.subdescription}
               </Typography>
-            </Box>
-            <Box sx={{ height: '100%', p: 2 }}>
+
               <Typography
                 variant="h5"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mb: 1, mt: { xs: 2, md: 3 } }}
               >
                 Rendimiento
               </Typography>
               <Performance />
+
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                sx={{ mt: 3 }}
+              >
+                <NextLink
+                  href={plan.informationLink}
+                  passHref
+                >
+                  <Button
+                    component="a"
+                    fullWidth
+                    size="large"
+                    variant="outlined"
+                  >
+                    Conocer más
+                  </Button>
+                </NextLink>
+                <NextLink
+                  href={plan.investmentLink}
+                  passHref
+                >
+                  <Button
+                    component="a"
+                    fullWidth
+                    size="large"
+                    variant="contained"
+                  >
+                    Invertir
+                  </Button>
+                </NextLink>
+              </Stack>
             </Box>
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              spacing={2}
-              p={2}
-              justifyContent="space-between"
-              alignItems="stretch"
-            >
-              <NextLink
-                href={plan.informationLink}
-                passHref
-              >
-                <Button
-                  component="a"
-                  size="large"
-                  fullWidth
-                  variant="outlined"
-                >
-                  Conocer más
-                </Button>
-              </NextLink>
-              <NextLink
-                href={plan.investmentLink}
-                passHref
-              >
-                <Button
-                  component="a"
-                  size="large"
-                  fullWidth
-                  variant="contained"
-                >
-                  Invertir
-                </Button>
-              </NextLink>
-            </Stack>
-          </Card>
+          </Grid>
         </Grid>
-      ) :
-        (
-          <Box sx={{ flexDirection: "column", border: "2px solid white", borderRadius: "16px", marginBottom: "24px" }}>
-            <Grid container width={{ md: "800px", lg: "1000px", xl: "1400px" }}
-            >
-              <Grid
-                item
-                md={6}
-                xs={12}
-              >
-                <BlogPostCardMediaWrapper isMobile={isMobile}>
-                  <CardMedia
-                    image={plan.cover}
-                    sx={{
-                      height: "100%",
-                      position: "absolute",
-                      width: "100%",
-                      objectFit: "cover",
-                      borderRadius: "16px 0 0 16px",
-                    }}
-                  />
-                </BlogPostCardMediaWrapper>
-              </Grid>
-              <Grid item md={6} xs={12}>
-                <Box sx={{ mt: 3, ml: 3, mr: 3 }}>
-                  <Typography variant="h5">{plan.title}</Typography>
-                  <Typography
-                    color="textSecondary"
-                    sx={{
-                      mt: 1,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      WebkitBoxOrient: "vertical",
-                      WebkitLineClamp: 2,
-                    }}
-                    variant="body1"
-                  >
-                    {plan.description}
-                  </Typography>
-                  <Typography
-                    color="textSecondary"
-                    sx={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      WebkitBoxOrient: "vertical",
-                      WebkitLineClamp: 2,
-                    }}
-                    variant="body1"
-                  >
-                    {plan.subdescription}
-                  </Typography>
-                </Box>
-                <Typography
-                  variant="h5"
-                  sx={{ mt: 3, mb: 2, ml: 3 }}
-                >
-                  Rendimiento
-                </Typography>
-                <Performance />
-                <Stack
-                  direction={{ xs: 'column', sm: 'row' }}
-                  spacing={2}
-                  pt={2}
-                  ml={3}
-                  mr={3}
-                  justifyContent="space-between"
-                  alignItems="stretch"
-                  marginBottom={"28px"}
-                >
-                  <NextLink
-                    href={plan.informationLink}
-                    passHref
-                  >
-                    <Button
-                      component="a"
-                      size="large"
-                      fullWidth
-                      variant="outlined"
-                    >
-                      Conocer más
-                    </Button>
-                  </NextLink>
-                  <NextLink
-                    href={plan.investmentLink}
-                    passHref
-                  >
-                    <Button
-                      component="a"
-                      size="large"
-                      fullWidth
-                      variant="contained"
-                    >
-                      Invertir
-                    </Button>
-                  </NextLink>
-                </Stack>
-              </Grid>
-            </Grid>
-          </Box>
-        )}
-    </div>
-  )
+      </Card>
+    </Grid>
+  );
 };

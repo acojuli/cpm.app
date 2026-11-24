@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { Box, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
   LineChart,
@@ -6,25 +7,21 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
+import { format } from "date-fns";
 import { getPerformance } from "src/slices/performance-slice";
 import { RootState, useDispatch } from "src/store";
 
+interface ChartData {
+  Fecha: string;
+  Performance: number;
+}
+
 const Chart = () => {
-  const { isLoading, performanceData } = useSelector(
+  const { error, isLoading, performanceData } = useSelector(
     (state: RootState) => state.performance
   );
-
-  interface ChartData {
-    Fecha: string;
-    Performance: number;
-  }
-
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-
-  const data = chartData.slice(1, 10);
 
   const dispatch = useDispatch();
 
@@ -32,43 +29,98 @@ const Chart = () => {
     dispatch(getPerformance());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (performanceData) {
-      const transformedData = performanceData.map((obj) => ({
-        Fecha: obj.label.toString(),
-        Performance: parseFloat(obj.perform.toFixed(2)),
-      }));
-      setChartData(transformedData);
-    }
+  const chartData = useMemo<ChartData[]>(() => {
+    return (performanceData || []).map((item) => ({
+      Fecha: format(new Date(item.label), "dd/MM"),
+      Performance: Number(item.perform.toFixed(2)),
+    }));
   }, [performanceData]);
 
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          alignItems: "center",
+          display: "flex",
+          height: 200,
+          justifyContent: "center",
+        }}
+      >
+        <Typography
+          color="textSecondary"
+          variant="caption"
+        >
+          Cargando...
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (error || chartData.length === 0) {
+    return (
+      <Box
+        sx={{
+          alignItems: "center",
+          display: "flex",
+          height: 200,
+          justifyContent: "center",
+          px: 2,
+          textAlign: "center",
+        }}
+      >
+        <Typography
+          color="textSecondary"
+          variant="caption"
+        >
+          No hay datos de rendimiento disponibles por el momento.
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <ResponsiveContainer width="95%" height={200}>
-      {isLoading ? (
-        <p>Cargando</p>
-      ) : (
-        <LineChart 
-          width={200} 
-          height={20} 
-          data={data}>
-          <XAxis dataKey="Fecha" padding={{ left: 30, right: 30 }} />
-          <YAxis domain={[ 870, 880]} padding={{ top: 10, bottom: 10}} />
+    <Box sx={{ height: 200, width: "100%" }}>
+      <ResponsiveContainer
+        height="100%"
+        width="100%"
+      >
+        <LineChart
+          data={chartData}
+          margin={{ bottom: 0, left: -18, right: 8, top: 8 }}
+        >
+          <XAxis
+            axisLine={false}
+            dataKey="Fecha"
+            minTickGap={16}
+            tick={{ fontSize: 11 }}
+            tickLine={false}
+          />
+          <YAxis
+            axisLine={false}
+            domain={["dataMin - 2", "dataMax + 2"]}
+            tick={{ fontSize: 11 }}
+            tickLine={false}
+            width={44}
+          />
           <Tooltip
-            contentStyle={{ backgroundColor: "#1C1C1C" }}
+            contentStyle={{
+              backgroundColor: "#1C1C1C",
+              border: "1px solid rgba(245, 250, 255, 0.18)",
+              borderRadius: 8,
+            }}
             itemStyle={{ color: "#00FF33" }}
-          />{" "}
-          <Legend />
+          />
           <Line
-            type="linear"
+            activeDot={{ r: 6, fill: "#00FF33" }}
             dataKey="Performance"
+            dot={false}
             stroke="#FFF"
-            fill="#00FF33"
-            activeDot={{ r: 8, fill: "#00FF33" }}
-            dot={{ r: 6, fill: "#00FF33" }}
+            strokeWidth={2}
+            type="monotone"
           />
         </LineChart>
-      )}
-    </ResponsiveContainer>
+      </ResponsiveContainer>
+    </Box>
   );
 };
 

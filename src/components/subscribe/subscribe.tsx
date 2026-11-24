@@ -1,29 +1,52 @@
-import { Container, Typography, TextField, Button, Box } from '@mui/material'
-import React from 'react'
+import { Container, Typography, TextField, Button, Box } from "@mui/material";
+import React from "react";
 
 const Subscribe = () => {
-    
   return (
-    <Container
-    sx= {{marginTop: '8rem' }}>
-      <Typography variant='h3' align='center'>
-      Suscribite para recibir información sobre
+    <Container sx={{ mt: { xs: 6, md: 10 } }}>
+      <Typography
+        variant="h3"
+        align="center"
+        sx={{ fontSize: { xs: "1.6rem", md: "2rem" } }}
+      >
+        Suscribite para recibir información sobre
       </Typography>
-      <Typography variant='h3' align='center'>
-      las novedades de la industria cripto
+      <Typography
+        variant="h3"
+        align="center"
+        sx={{ fontSize: { xs: "1.6rem", md: "2rem" } }}
+      >
+        las novedades de la industria cripto
       </Typography>
-      <Box display='flex' justifyContent='center' alignItems='center' marginTop= '2rem' marginBottom={{xs: '2rem'}} paddingX= '2rem' flexDirection= {{ xs: 'column' , md: 'row'}}>
-      <TextField id="outlined-basic" label="Tu email" variant="outlined" fullWidth multiline rows={0.5} sx={{marginRight: '1rem', maxWidth: {xs: '100%', md: '20rem'}}} />
-      <Button
-                  component="a"
-                  variant="contained"
-                  sx= {{marginTop: { xs: '1rem', md: 0} }}
-                >
-                  Suscribirme
-                </Button>
-                </Box> 
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        marginTop="2rem"
+        marginBottom={{ xs: "2rem" }}
+        paddingX="2rem"
+        flexDirection={{ xs: "column", md: "row" }}
+      >
+        <TextField
+          id="outlined-basic"
+          label="Tu email"
+          variant="outlined"
+          fullWidth
+          sx={{
+            marginRight: { xs: 0, md: "1rem" },
+            maxWidth: { xs: "100%", md: "20rem" },
+          }}
+        />
+        <Button
+          component="a"
+          variant="contained"
+          sx={{ marginTop: { xs: "1rem", md: 0 } }}
+        >
+          Suscribirme
+        </Button>
+      </Box>
     </Container>
-  )
-}
+  );
+};
 
-export default Subscribe
+export default Subscribe;

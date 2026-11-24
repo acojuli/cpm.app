@@ -5,9 +5,11 @@ import { Performance, PerformanceDetail } from "../types/performance-data";
 interface PerformanceState {
   performanceData: Performance[];
   isLoading: boolean;
+  error: string | null;
 }
 
 const performanceInitialState: PerformanceState = {
+  error: null,
   isLoading: false,
   performanceData: [],
 };
@@ -27,9 +29,15 @@ const slice = createSlice({
     builder.addCase(getPerformance.fulfilled, (state, { payload }) => {
       state.performanceData = payload;
       state.isLoading = false;
+      state.error = null;
     }),
       builder.addCase(getPerformance.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
+      }),
+      builder.addCase(getPerformance.rejected, (state, { error }) => {
+        state.isLoading = false;
+        state.error = error.message || "No se pudo obtener el rendimiento";
       });
   },
 });

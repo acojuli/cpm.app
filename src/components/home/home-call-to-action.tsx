@@ -1,74 +1,79 @@
 import type { FC } from "react";
 import { Box } from "@mui/system";
-import { Grid, Button, Typography } from "@mui/material";
-import { Plan } from "src/types/plan";
-import { HomeCallCard } from "./home-call-to-action-card";
-import { useSelector } from "react-redux";
-import { RootState } from "src/store";
+import { Button, Container, Typography } from "@mui/material";
+import NextLink from "next/link";
 
 export const HomeCallToAction: FC = () => {
-    const isMobile = useSelector((state: RootState) => state.mobile.isMobile);
+  return (
+    <Box
+      component="section"
+      sx={{ pt: { xs: 6, md: 10 } }}
+    >
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            alignItems: "center",
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: { xs: 4, md: 8 },
+          }}
+        >
+          <Box
+            sx={{
+              flex: 1,
+              textAlign: { xs: "center", md: "left" },
+              width: "100%",
+            }}
+          >
+            <Typography
+              variant="h3"
+              sx={{ fontSize: { xs: "1.7rem", sm: "2rem" } }}
+            >
+              Registrate e invertí
+            </Typography>
+            <Typography
+              variant="h3"
+              sx={{ fontSize: { xs: "1.7rem", sm: "2rem" }, mb: 3 }}
+            >
+              en la industria cripto
+            </Typography>
+            <NextLink
+              href="/register"
+              passHref
+            >
+              <Button
+                component="a"
+                size="large"
+                variant="contained"
+                sx={{ px: { xs: 4, md: 6 } }}
+              >
+                Invertir
+              </Button>
+            </NextLink>
+          </Box>
 
-    return (
-        isMobile ? (
-        <Box>
-            <div style={{ display:'flex', alignItems:'center', textAlign:'center', justifyContent:'center' }} >
-            <Grid>
-                <Typography align="center"
-                            variant="subtitle2"
-                            sx={{ padding:"36pt", marginTop:"20pt" }}>
-                            Registrate y empezá a invertir en la industria cripto
-                </Typography>
-                <Button
-          sx= {{ width: 'fit-content',  padding: '4pt 24pt 4pt 24pt', marginTop: '-26pt' }}
-                      component="a"
-                      size="large"
-                      variant="contained"
-                    >
-                      Invertir
-            </Button>
-            </Grid> 
-            </div>
-            <div style={{ flex: 1, alignItems: 'bottom', marginBottom: '-3pt', marginTop:'-44pt' }}>
-        <img
-        alt="home-cta-mobile"
-        src="/images/home-cta-mobile.svg"
-      />
-        </div>
+          <Box
+            sx={{
+              display: "flex",
+              flex: 1,
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <Box
+              component="img"
+              src="/images/home-cta.svg"
+              alt="Personas invirtiendo en cripto"
+              sx={{
+                display: "block",
+                height: "auto",
+                maxWidth: 560,
+                width: "100%",
+              }}
+            />
+          </Box>
         </Box>
-        ) : (
-        //desktop
-        <Box margin='12rem 0 -0.2rem 7.5rem'>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-        {/* Columna de Texto e Input */}
-        <div style={{ flex: 1 }}>
-        <Typography align="left"
-                    variant="h3">
-                    Registrate e invertí
-        </Typography>
-        <Typography align="left"
-                    variant="h3"
-                    marginBottom={ '2rem' }>
-                    en la indrustria cripto
-                    </Typography>
-          <Button
-          sx= {{ width: 'fit-content', paddingLeft: '40pt', paddingRight: '40pt' }}
-                      component="a"
-                      size="large"
-                      variant="contained"
-                    >
-                      Invertir
-            </Button>
-        </div>
-        {/* Columna de Imagen */}
-        <div style={{ flex: 1, alignItems: 'bottom' }}>
-        <img
-        alt="home-cta"
-        src="/images/home-cta.svg"
-      />
-        </div>
-      </div>
-      </Box>
-        )
-    )
-}
+      </Container>
+    </Box>
+  );
+};

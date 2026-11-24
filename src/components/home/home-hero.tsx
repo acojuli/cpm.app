@@ -1,191 +1,95 @@
 import type { FC } from "react";
 import NextLink from "next/link";
-import { Box, Button, Container, Typography, Grid } from "@mui/material";
-import { useSelector } from 'react-redux';
-import { RootState } from 'src/store';
+import { Box, Button, Container, Stack, Typography } from "@mui/material";
 
-export const HomeHero: FC = (props) => {
-
-  const isMobile = useSelector((state: RootState) => state.mobile.isMobile);
-
+export const HomeHero: FC = () => {
   return (
-    <>
-      <div>
-        {isMobile ? (
-          <Box
-            sx={{
-              pt: 3,
-              pb: 3,
-            }}
-            {...props}
-          >
-            <Box
+    <Box
+      component="section"
+      sx={{
+        pt: { xs: 6, md: 10 },
+        pb: { xs: 4, md: 6 },
+      }}
+    >
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            alignItems: "center",
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: { xs: 4, md: 8 },
+          }}
+        >
+          <Box sx={{ flex: 1, width: "100%", maxWidth: { md: 540 } }}>
+            <Typography
+              align="left"
+              variant="h1"
               sx={{
-                maxWidth: 450,
-                width: "100%",
-                mx: "auto",
-                backgroundColor: 'primary.nav',
+                fontSize: { xs: "2.6rem", sm: "3.25rem", md: "4.375rem" },
+                letterSpacing: { xs: "2px", md: "4px" },
+                lineHeight: 1.12,
               }}
             >
-              <Box
-                sx={{
-                  justifyContent: "flex-end",
-                  "& img": {
-                    maxWidth: "95%",
-                    height: "auto",
-                    position: "absolute",
-                    top: 215,
-                  },
-                }}
-              >
-                <img
-                  alt="hero"
-                  src="/images/home-heroimg.svg"
-                />
-              </Box>
-            </Box>
-            <Container
-              maxWidth="md"
+              Fondos cripto
+              <br />
+              indexados
+            </Typography>
+
+            <Stack
+              spacing={0.5}
+              sx={{ mt: { xs: 2, md: 3 } }}
             >
               <Typography
                 align="left"
-                variant="h1"
-                letterSpacing="3px"
-              >
-                Fondos cripto
-
-              </Typography>
-              <Typography
-                align="left"
-                variant="h1"
-                paddingBottom={2}
-                letterSpacing="3px"
-              >
-                indexados
-
-              </Typography>
-              <Typography
-                align="left"
-                variant="subtitle2"
-                sx={{ py: 0 }}
+                variant="subtitle1"
               >
                 Estrategia automatizada
               </Typography>
               <Typography
                 align="left"
-                variant="subtitle2"
-                sx={{ paddingBottom: 25, paddingTop: 1 }}
+                variant="subtitle1"
               >
                 Exposición diversificada
               </Typography>
-              <NextLink
-                href="/dashboard"
-                passHref
+            </Stack>
+
+            <NextLink
+              href="/dashboard"
+              passHref
+            >
+              <Button
+                component="a"
+                size="large"
+                variant="contained"
+                sx={{ mt: { xs: 3, md: 5 }, px: { xs: 4, md: 6 } }}
               >
-                <Box textAlign="center">
-                  <Button
-                    sx={{ maxWidth: "350px", marginTop: 6 }}
-                    component="a"
-                    size="large"
-                    variant="contained"
-                  >
-                    Invertir
-                  </Button>
-                </Box>
-              </NextLink>
-            </Container>
+                Invertir
+              </Button>
+            </NextLink>
           </Box>
-        ) : (
-          // desktop
-          <div style={{ padding: 80 }}>
-            <Grid item
-              xs={12}
-              sm={12}
-              md={6}
-              lg={6}>
-              <Container
-                maxWidth="md"
-                sx={{
-                  alignItems: "left",
-                  display: "flex",
-                  flexDirection: "column",
-                  padding: 5,
-                }}
-              >
-                <Typography
-                  align="left"
-                  variant="h1"
-                >
-                  Fondos cripto
-                </Typography>
-                <Typography
-                  align="left"
-                  variant="h1"
-                  paddingBottom={2}
-                >
-                  indexados
-                </Typography>
-                <Typography
-                  align="left"
-                  variant="subtitle1"
-                  sx={{ py: 1 }}
-                >
-                  Estrategia automatizada
-                </Typography>
-                <Typography
-                  paddingTop={0}
-                  align="left"
-                  variant="subtitle1"
-                  sx={{ paddingTop: 0 }}
-                >
-                  Exposición diversificada
-                </Typography>
-              </Container>
 
-
-              <Container
-                maxWidth="md"
-                sx={{
-                  alignItems: "right",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <NextLink
-                  href="/dashboard"
-                  passHref
-                >
-                  <Button
-                    sx={{ width: 'fit-content', paddingLeft: '40pt', paddingRight: '40pt' }}
-                    component="a"
-                    size="large"
-                    variant="contained"
-                  >
-                    Invertir
-                  </Button>
-                </NextLink>
-                <Box
-                  sx={{
-                    justifyContent: "flex-end",
-                    "& img": {
-                      height: "auto",
-                      position: "absolute",
-                      top: 70,
-                      left: { md: 600, lg: 350, xl: 900 },
-                      right: 150
-                    },
-                  }}
-                >
-                  <img
-                    alt="hero"
-                    src="/images/home-heroimg.svg"
-                  />
-                </Box>
-              </Container>
-            </Grid>
-          </div>
-        )}
-      </div>
-    </>
+          <Box
+            sx={{
+              display: "flex",
+              flex: 1,
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <Box
+              component="img"
+              src="/images/home-heroimg.svg"
+              alt="Ilustración de fondos cripto indexados"
+              sx={{
+                display: "block",
+                height: "auto",
+                maxWidth: { xs: 380, sm: 460, md: 620 },
+                width: "100%",
+              }}
+            />
+          </Box>
+        </Box>
+      </Container>
+    </Box>
   );
 };
