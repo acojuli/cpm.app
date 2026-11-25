@@ -2,126 +2,110 @@ import { useCallback, useEffect, useState } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import NextLink from 'next/link';
-import { format, subHours } from 'date-fns';
+import { useRouter } from 'next/router';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import Markdown from 'react-markdown';
-import { Avatar, Box, Button, Card, Chip, Container, Divider, Typography } from '@mui/material';
+import { Avatar, Box, Button, Chip, Container, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { blogApi } from '../../__next-api__/blog-api';
 import { BlogNewsletter } from '../../components/blog/blog-newsletter';
-import { BlogComment } from '../../components/blog/blog-comment';
-import { BlogCommentAdd } from '../../components/blog/blog-comment-add';
 import { ArrowLeft as ArrowLeftIcon } from '../../icons/arrow-left';
 import { useMounted } from '../../hooks/use-mounted';
 import { gtm } from '../../lib/gtm';
 import type { Post } from '../../types/blog';
+import { MainNavbar } from 'src/components/main-navbar';
+import { MainSidebar } from 'src/components/main-sidebar';
 import { Footer } from 'src/components/footer';
-
-interface Comment {
-  id: string;
-  authorAvatar: string;
-  authorName: string;
-  authorRole: string;
-  content: string;
-  createdAt: number;
-  isLiked: boolean;
-  likes: number;
-}
-
-const comments: Comment[] = [
-  {
-    id: 'd0ab3d02ef737fa6b007e35d',
-    authorAvatar: '/static/mock-images/avatars/avatar-alcides_antonio.png',
-    authorName: 'Alcides Antonio',
-    authorRole: 'Product Designer',
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    createdAt: subHours(new Date(), 2).getTime(),
-    isLiked: true,
-    likes: 12
-  },
-  {
-    id: '3ac1e17289e38a84108efdf3',
-    authorAvatar: '/static/mock-images/avatars/avatar-jie_yan_song.png',
-    authorName: 'Jie Yan Song',
-    authorRole: 'Web Developer',
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.',
-    createdAt: subHours(new Date(), 8).getTime(),
-    isLiked: false,
-    likes: 8
-  }
-];
 
 const MarkdownWrapper = styled('div')(
   ({ theme }) => ({
-    color: theme.palette.text.primary,
+    color: theme.palette.text.secondary,
     fontFamily: theme.typography.fontFamily,
     '& h2': {
-      fontSize: theme.typography.h5.fontSize,
+      color: theme.palette.text.primary,
+      fontSize: 24,
       fontWeight: theme.typography.fontWeightBold,
-      lineHeight: theme.typography.h5.lineHeight,
-      marginBottom: theme.spacing(3)
+      lineHeight: 1.3,
+      margin: theme.spacing(5, 0, 2)
     },
     '& h3': {
-      fontSize: theme.typography.h3.fontSize,
+      color: theme.palette.text.primary,
+      fontSize: 20,
       fontWeight: theme.typography.fontWeightBold,
-      lineHeight: theme.typography.h3.lineHeight,
-      marginBottom: theme.spacing(3)
+      lineHeight: 1.3,
+      margin: theme.spacing(4, 0, 2)
     },
     '& p': {
-      fontSize: theme.typography.body1.fontSize,
-      lineHeight: theme.typography.body1.lineHeight,
-      marginBottom: theme.spacing(2)
+      fontSize: 17,
+      lineHeight: 1.85,
+      marginBottom: theme.spacing(2.5)
     },
     '& li': {
-      fontSize: theme.typography.body1.fontSize,
-      lineHeight: theme.typography.body1.lineHeight,
+      fontSize: 17,
+      lineHeight: 1.85,
       marginBottom: theme.spacing(1)
+    },
+    '& a': {
+      color: theme.palette.primary.main
     }
   })
 );
 
 const BlogPostDetails: NextPage = () => {
   const isMounted = useMounted();
+  const router = useRouter();
   const [post, setPost] = useState<Post | null>(null);
+  const [notFound, setNotFound] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const postId = router.query.postId?.toString();
 
   useEffect(() => {
     gtm.push({ event: 'page_view' });
   }, []);
 
   const getPost = useCallback(async () => {
+    if (!postId) {
+      return;
+    }
+
     try {
-      const data = await blogApi.getPost();
+      const data = await blogApi.getPost(postId);
 
       if (isMounted()) {
         setPost(data);
       }
     } catch (err) {
-      console.error(err);
+      if (isMounted()) {
+        setNotFound(true);
+      }
     }
-  }, [isMounted]);
+  }, [isMounted, postId]);
 
   useEffect(() => {
     getPost();
   }, [getPost]);
 
-  if (!post) {
-    return null;
-  }
-
   return (
     <>
       <Head>
-        <title>
-          CPM | Blog
-        </title>
+        <title>{post ? `${post.title} | CPM` : 'CPM | Blog'}</title>
       </Head>
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          py: 8
+          pb: 10,
+          pt: 10
         }}
       >
         <Container maxWidth="md">
+          <MainNavbar onOpenSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+          <MainSidebar
+            onClose={(): void => setIsSidebarOpen(false)}
+            open={isSidebarOpen}
+          />
+
           <NextLink
             href="/blog"
             passHref
@@ -129,72 +113,98 @@ const BlogPostDetails: NextPage = () => {
             <Button
               component="a"
               startIcon={<ArrowLeftIcon fontSize="small" />}
+              sx={{ mt: 2 }}
             >
-              Blog
+              Volver al blog
             </Button>
           </NextLink>
-          <Typography
-            sx={{ mt: 3 }}
-            variant="h3"
-          >
-            {post.title}
-          </Typography>
-          <Typography
-            color="textSecondary"
-            sx={{ mt: 3 }}
-            variant="subtitle1"
-          >
-            {post.shortDescription}
-          </Typography>
-          <Box
-            sx={{
-              alignItems: 'center',
-              display: 'flex',
-              mt: 3
-            }}
-          >
-            <Avatar src={post.author.avatar} />
-            <Box sx={{ ml: 2 }}>
-              <Typography variant="subtitle2">
-                By
-                {' '}
-                {post.author.name}
-                {' '}
-                •
-                {' '}
-                {format(post.publishedAt, 'MMMM d, yyyy')}
+
+          {notFound && (
+            <Typography
+              color="textSecondary"
+              sx={{ mt: 4 }}
+            >
+              No encontramos este artículo.
+            </Typography>
+          )}
+
+          {post && (
+            <>
+              <Box sx={{ mt: 3 }}>
+                <Chip
+                  label={post.category}
+                  size="small"
+                />
+              </Box>
+              <Typography
+                component="h1"
+                sx={{
+                  fontSize: { md: 40, xs: 28 },
+                  fontWeight: 700,
+                  lineHeight: 1.2,
+                  mt: 2
+                }}
+              >
+                {post.title}
               </Typography>
               <Typography
                 color="textSecondary"
-                variant="body2"
+                sx={{ fontSize: 18, lineHeight: 1.7, mt: 2 }}
               >
-                {`${post.readTime} read`}
+                {post.shortDescription}
               </Typography>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              backgroundImage: `url(${post.cover})`,
-              backgroundPosition: 'center',
-              backgroundSize: 'cover',
-              borderRadius: 1,
-              height: 380,
-              mt: 3
-            }}
-          />
-          <Box sx={{ py: 3 }}>
-            <MarkdownWrapper>
-              {post.content && (
-                <Markdown children={post.content} />
-              )}
-            </MarkdownWrapper>
-          </Box>
-            
-          <Box sx={{ mt: 8 }}>
-                        <BlogNewsletter />
-                    </Box>
-                    <Box sx={{ mt: 8 }}>
-          </Box>
+              <Box
+                sx={{
+                  alignItems: 'center',
+                  display: 'flex',
+                  gap: 1.5,
+                  mt: 3
+                }}
+              >
+                <Avatar src={post.author.avatar}>
+                  {post.author.name.charAt(0)}
+                </Avatar>
+                <Box>
+                  <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                    {post.author.name}
+                  </Typography>
+                  <Typography
+                    color="textSecondary"
+                    sx={{ fontSize: 13 }}
+                  >
+                    {format(post.publishedAt, "d 'de' MMMM, yyyy", { locale: es })}
+                    {' · '}
+                    {`${post.readTime} de lectura`}
+                  </Typography>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  aspectRatio: '16 / 9',
+                  backgroundImage: `url(${post.cover})`,
+                  backgroundPosition: 'center',
+                  backgroundSize: 'cover',
+                  borderRadius: 2,
+                  mt: 4
+                }}
+              />
+              <Box sx={{ py: 4 }}>
+                {post.content ? (
+                  <MarkdownWrapper>
+                    <Markdown>{post.content}</Markdown>
+                  </MarkdownWrapper>
+                ) : (
+                  <Typography color="textSecondary">
+                    Este artículo estará disponible próximamente.
+                  </Typography>
+                )}
+              </Box>
+
+              <Box sx={{ mt: 8 }}>
+                <BlogNewsletter />
+              </Box>
+            </>
+          )}
         </Container>
       </Box>
       <Footer />

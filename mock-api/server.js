@@ -588,6 +588,12 @@ const handleRequest = async (req, res) => {
     return;
   }
 
+  if (path === "/contactForm" && method === "POST") {
+    console.log(`[mock] Mensaje de contacto de ${body.email || "anónimo"}`);
+    send(res, 201, { message: "Mensaje recibido" });
+    return;
+  }
+
   if (path === "/users/access-log" && method === "GET") {
     send(res, 200, {
       data: [
