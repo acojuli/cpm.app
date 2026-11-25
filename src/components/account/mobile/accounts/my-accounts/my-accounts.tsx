@@ -1,16 +1,11 @@
 import {
   Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Divider,
   Grid,
 } from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useDispatch, useSelector } from "src/store";
 import { Account } from "src/types/user-data/account";
 import { useState } from "react";
+import { SettingsCard } from "src/components/account/settings-card";
 import { AccountList } from "./account-list";
 import { ModalMyInfo } from "../../../../common/modal/modal-my-info";
 import { AddAccountForm } from "./add-account-form";
@@ -76,32 +71,39 @@ export const MyAccounts = () => {
   };
   return (
     <>
-      <Grid item md={12} xs={12}>
-        <Card>
-          <CardHeader title="Cuentas bancarias" />
-          <CardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
-            {myAccounts.length > 0 ? (
-              <AccountList
-                myAccounts={myAccounts}
-                handleDeleteAccount={handleDeleteAccount}
-              />
-            ) : (
-              <>
-                <Typography style={{ color: "#A1AEC1" }}>
-                  Aún no tenés una cuenta bancaria asociada.
-                </Typography>
-                <Typography style={{ color: "#A1AEC1" }}>
-                  Agrega una para empezar a invertir
-                </Typography>
-              </>
-            )}
-          </CardContent>
-          <CardActions style={{ paddingTop: 0 }}>
-            <Button endIcon={<ArrowForwardIcon />} onClick={openAddAccount}>
-              Agregar cuenta bancaria
+      <Grid
+        item
+        md={12}
+        xs={12}
+      >
+        <SettingsCard
+          action={
+            <Button
+              onClick={openAddAccount}
+              size="small"
+              variant="contained"
+            >
+              Agregar cuenta
             </Button>
-          </CardActions>
-        </Card>
+          }
+          description="Cuentas desde las que vas a ingresar y retirar dinero."
+          title="Cuentas bancarias"
+        >
+          {myAccounts.length > 0 ? (
+            <AccountList
+              myAccounts={myAccounts}
+              handleDeleteAccount={handleDeleteAccount}
+            />
+          ) : (
+            <Typography
+              color="textSecondary"
+              variant="body2"
+            >
+              Aún no tenés una cuenta bancaria asociada. Agregá una para
+              empezar a invertir.
+            </Typography>
+          )}
+        </SettingsCard>
       </Grid>
       <ModalMyInfo open={openModal} handleClose={closeModal}>
         <AddAccountForm closeModal={closeModal} />

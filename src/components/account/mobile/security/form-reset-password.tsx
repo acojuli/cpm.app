@@ -1,12 +1,13 @@
 import {
+  Box,
   Button,
   Grid,
-  Paper,
-  Typography,
+  Stack,
 } from "@mui/material";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { PasswordField } from "src/components/common";
+import { SettingsCard } from "src/components/account/settings-card";
 import {
   errorNotification,
   succesNotification,
@@ -75,60 +76,51 @@ export const FormResetPassword: FC<Props> = ({ token, redirect }) => {
     },
   });
   return (
-    <Grid container item xs={12} sm={12}>
-      <Grid container item component={Paper} padding={2}>
-        <Grid item xs={12} sm={12} md={3} lg={3}>
-          <Typography>Cambiar contraseña</Typography>
-        </Grid>
-        <Grid
-          container
-          direction="row"
+    <Grid item xs={12}>
+      <SettingsCard
+        description={PASSWORD_POLICY_MESSAGE}
+        title="Cambiar contraseña"
+      >
+        <Stack
           component="form"
           onSubmit={formik.handleSubmit}
-          spacing={1}
-          item
-          md={9}
-          lg={9}
+          spacing={2}
+          sx={{ maxWidth: 480 }}
         >
-          <Grid item xs={12} sm={12} md={12} lg={12}>
-            <PasswordField
-              error={formik.errors.password}
-              handleBlur={formik.handleBlur}
-              value={formik.values.password}
-              label="Nueva contraseña"
-              handleChange={formik.handleChange}
-              name="password"
-              touched={formik.touched.password}
-              placeholder="Ingresa tu nueva contraseña"
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12}>
-            <PasswordField
-              error={formik.errors.password_confirm}
-              handleBlur={formik.handleBlur}
-              value={formik.values.password_confirm}
-              label="Confirma tu contraseña nueva"
-              handleChange={formik.handleChange}
-              name="password_confirm"
-              touched={formik.touched.password_confirm}
-              placeholder="Confirma tu nueva contraseña"
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12}>
+          <PasswordField
+            error={formik.errors.password}
+            handleBlur={formik.handleBlur}
+            value={formik.values.password}
+            label="Nueva contraseña"
+            handleChange={formik.handleChange}
+            name="password"
+            touched={formik.touched.password}
+            placeholder="Ingresá tu nueva contraseña"
+          />
+          <PasswordField
+            error={formik.errors.password_confirm}
+            handleBlur={formik.handleBlur}
+            value={formik.values.password_confirm}
+            label="Confirmá tu nueva contraseña"
+            handleChange={formik.handleChange}
+            name="password_confirm"
+            touched={formik.touched.password_confirm}
+            placeholder="Confirmá tu nueva contraseña"
+          />
+          <Box>
             <Button
-              fullWidth
-              type="submit"
               disabled={Boolean(
                 Object.keys(formik.errors).length || formik.isSubmitting
               )}
+              sx={{ minWidth: { md: 220, xs: "100%" } }}
+              type="submit"
               variant="contained"
-              color="primary"
             >
               Cambiar contraseña
             </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+          </Box>
+        </Stack>
+      </SettingsCard>
     </Grid>
   );
 };
