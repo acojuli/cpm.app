@@ -49,6 +49,7 @@ export const LoggedLayout: FC<LayoutProps> = ({ children = "CPM", head }) => {
             item
             md={9}
             lg={10}
+            xs={12}
             container
             justifyContent="flex-start"
             alignItems="flex-start"
