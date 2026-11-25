@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Box, Button, CircularProgress, Container, Typography } from '@mui/material';
+import { Button, CircularProgress, Typography } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
+import { AuthShell } from 'src/components/authentication/auth-shell';
 import { authApi, toApiError } from 'src/services/api-auth';
 import { getSafeReturnUrl } from 'src/utils/safe-return-url';
 import { MOCK_VERIFICATION_TOKEN_KEY } from 'src/services/api-config';
@@ -101,34 +102,33 @@ export default function VerifyEmailPage() {
   ]);
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          alignItems: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '60vh',
-          justifyContent: 'center',
-          textAlign: 'center',
-          gap: 2,
-        }}
-      >
-        <Typography variant="h4" component="h1">
-          Verificación de email
-        </Typography>
+    <AuthShell
+      description={
+        status === 'error' ? (
+          <Typography
+            color="error"
+            component="span"
+          >
+            {message}
+          </Typography>
+        ) : (
+          message
+        )
+      }
+      title="Verificación de email"
+    >
+      {status === 'loading' && <CircularProgress />}
 
-        {status === 'loading' && <CircularProgress />}
-
-        <Typography color={status === 'error' ? 'error' : 'textSecondary'}>
-          {message}
-        </Typography>
-
-        {status === 'error' && (
-          <Button variant="contained" onClick={() => router.push('/login')}>
-            Volver al login
-          </Button>
-        )}
-      </Box>
-    </Container>
+      {status === 'error' && (
+        <Button
+          fullWidth
+          onClick={() => router.push('/login')}
+          size="large"
+          variant="contained"
+        >
+          Volver a iniciar sesión
+        </Button>
+      )}
+    </AuthShell>
   );
 }

@@ -21,7 +21,7 @@ const Login: NextPage = () => {
     <>
       <Head>
         <title>
-          Login | CPM
+          Iniciar sesión | CPM
         </title>
       </Head>
       <Box
@@ -30,6 +30,7 @@ const Login: NextPage = () => {
           backgroundColor: 'background.paper',
           display: 'flex',
           flexDirection: 'column',
+          justifyContent: 'center',
           minHeight: '100vh'
         }}
       >
@@ -42,10 +43,11 @@ const Login: NextPage = () => {
           }}
         >
           <Card
-            elevation={16}
+            elevation={0}
             sx={{ 
-                p: 4,
-                backgroundColor:'background.default'
+                backgroundColor:'background.default',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                p: { sm: 5, xs: 3 }
             }}
           >
             <Box
@@ -69,16 +71,18 @@ const Login: NextPage = () => {
                   />
                 </a>
               </NextLink>
-              <Typography variant="h4">
+              <Typography
+                component="h1"
+                sx={{ fontSize: 24, fontWeight: 700, mt: 1 }}
+              >
                 Hola de nuevo
               </Typography>
               <Typography
                 color="textSecondary"
-                sx={{ mt: 2 }}
-                variant="body2"
+                sx={{ fontSize: 15, mt: 1 }}
               >
-                  Iniciar sesión
-            </Typography>
+                Iniciá sesión para ver tu portfolio
+              </Typography>
             </Box>
             <Box
               sx={{
@@ -98,7 +102,7 @@ const Login: NextPage = () => {
                 textAlign:'center'
                 }}
             >
-            Aún no tenés cuenta? {' '}
+            ¿Aún no tenés cuenta? {' '}
               <NextLink
                 href={{
                   pathname: '/register',

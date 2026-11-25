@@ -173,7 +173,7 @@ export const JWTRegister: FC = (props) => {
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
-                  aria-label="toggle password visibility"
+                  aria-label="Mostrar u ocultar contraseña"
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
                 >
@@ -200,22 +200,22 @@ export const JWTRegister: FC = (props) => {
               htmlFor="outlined-adornment-password-confirmation"
               error={Boolean(formik.touched.passwordConfirmation && formik.errors.passwordConfirmation)}
             >
-              Confirma Contraseña
+              Confirmá tu contraseña
             </InputLabel>
           <OutlinedInput
             error={Boolean(formik.touched.passwordConfirmation && formik.errors.passwordConfirmation)}
             fullWidth
             name="passwordConfirmation"
-            label="Confirma contraseña"
+            label="Confirmá tu contraseña"
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             type={showPassword? "text":"password"}
             value={formik.values.passwordConfirmation}
-            placeholder='confirma tu contraseña'
+            placeholder='confirmá tu contraseña'
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
-                  aria-label="toggle password visibility"
+                  aria-label="Mostrar u ocultar contraseña"
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
                 >
@@ -248,8 +248,13 @@ export const JWTRegister: FC = (props) => {
         />
         <Typography color="textSecondary" variant="body2">
           Acepto los{" "}
-          <Link component="a" href="https://www.cpm.la/terminos">
-            Terminos y Condiciones
+          <Link
+            component="a"
+            href="/terminos"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Términos y Condiciones
           </Link>
         </Typography>
       </Box>
@@ -264,7 +269,7 @@ export const JWTRegister: FC = (props) => {
           type="submit"
           variant="contained"
         >
-          Register
+          Crear cuenta
         </Button>
       </Box>
     </form>

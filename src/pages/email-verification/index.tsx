@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Container, Box, Typography, Button, Alert, Link } from '@mui/material';
+import { Alert, Button, Link, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import { RootState } from 'src/store';
 import { useAuth } from 'src/hooks/use-auth';
+import { AuthShell } from 'src/components/authentication/auth-shell';
 import { authApi, toApiError } from 'src/services/api-auth';
 import { getSafeReturnUrl } from 'src/utils/safe-return-url';
 import { MOCK_VERIFICATION_TOKEN_KEY } from 'src/services/api-config';
@@ -103,85 +104,87 @@ const EmailVerificationPage = () => {
   };
 
   return (
-    <Container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'primary.default', p: 0 }}>
-      <Box sx={{ width: '100%', textAlign: 'center', color: 'common.white', p: 3 }}>
-        <Typography
-          variant="h5"
-          component="h1"
-          gutterBottom
-        >
-          Verifica tu email
-        </Typography>
-        <Typography>Te enviamos un email a:</Typography>
-        <Typography fontWeight="fontWeightBold">
-          {userEmail || 'tu correo registrado'}
-        </Typography>
-        <Typography gutterBottom>
-          Revisa tu correo y haz click en el enlace que te enviamos
-        </Typography>
-
-        {mockToken && (
-          <Alert severity="info" sx={{ mt: 2, textAlign: 'left', color: 'text.primary' }}>
-            <Typography variant="body2" fontWeight="fontWeightBold">
-              Modo mock: no se envían emails reales.
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 1 }}>
-              Usá este enlace para verificar la cuenta:
-            </Typography>
-            <Link
-              href={`/verify-email?token=${encodeURIComponent(mockToken)}`}
-              underline="always"
-            >
-              Verificar mi email ahora
-            </Link>
-          </Alert>
-        )}
-
-        {feedback && (
-          <Alert
-            severity={feedback.type}
-            sx={{ mt: 2, textAlign: 'left' }}
-            onClose={() => setFeedback(null)}
+    <AuthShell
+      description={
+        <>
+          Te enviamos un email a{' '}
+          <Typography
+            color="textPrimary"
+            component="span"
+            sx={{ fontWeight: 700 }}
           >
-            {feedback.text}
-          </Alert>
-        )}
-
-        <Button
-          variant="contained"
-          onClick={handleResendEmail}
-          disabled={sending}
-          sx={{
-            mt: 2,
-            bgcolor: 'secondary.main',
-            '&:hover': {
-              bgcolor: 'secondary.dark',
-            },
-          }}
+            {userEmail || 'tu correo registrado'}
+          </Typography>
+          . Revisá tu bandeja de entrada (y el spam) y hacé clic en el enlace
+          que te enviamos.
+        </>
+      }
+      title="Verificá tu email"
+    >
+      {mockToken && (
+        <Alert
+          severity="info"
+          sx={{ mb: 2, textAlign: 'left' }}
         >
-          {sending ? 'Enviando...' : 'Reenviar email'}
-        </Button>
+          <Typography
+            fontWeight="fontWeightBold"
+            variant="body2"
+          >
+            Modo mock: no se envían emails reales.
+          </Typography>
+          <Typography
+            sx={{ mb: 1 }}
+            variant="body2"
+          >
+            Usá este enlace para verificar la cuenta:
+          </Typography>
+          <Link
+            href={`/verify-email?token=${encodeURIComponent(mockToken)}`}
+            underline="always"
+          >
+            Verificar mi email ahora
+          </Link>
+        </Alert>
+      )}
+
+      {feedback && (
+        <Alert
+          onClose={() => setFeedback(null)}
+          severity={feedback.type}
+          sx={{ mb: 2, textAlign: 'left' }}
+        >
+          {feedback.text}
+        </Alert>
+      )}
+
+      <Stack spacing={1.5}>
         <Button
-          variant="outlined"
-          onClick={handleCheckVerification}
           disabled={checking}
-          sx={{ mt: 2, ml: { sm: 1 }, color: 'common.white', borderColor: 'common.white' }}
+          fullWidth
+          onClick={handleCheckVerification}
+          size="large"
+          variant="contained"
         >
           {checking ? 'Comprobando...' : 'Ya verifiqué mi email'}
         </Button>
         <Button
+          disabled={sending}
+          fullWidth
+          onClick={handleResendEmail}
+          size="large"
+          variant="outlined"
+        >
+          {sending ? 'Enviando...' : 'Reenviar email'}
+        </Button>
+        <Button
+          color="inherit"
+          fullWidth
           onClick={handleReturnHome}
-          sx={{
-            mt: 2,
-            color: 'common.white',
-            display: 'block',
-            width: '100%',
-          }}
         >
           Volver al inicio
         </Button>
-      </Box>
-    </Container>
+      </Stack>
+    </AuthShell>
   );
 };
 
