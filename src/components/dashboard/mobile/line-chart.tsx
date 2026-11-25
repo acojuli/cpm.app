@@ -1,65 +1,57 @@
 import { useTheme } from "@mui/material/styles";
 import type { ApexOptions } from "apexcharts";
-import { FC } from "react";
 import { Chart } from "./chart";
 
-export const LineChart: FC = () => {
+interface Props {
+  height?: number | string;
+  width?: number | string;
+}
+
+export const LineChart = ({ height = 90, width = 180 }: Props) => {
   const theme = useTheme();
 
   const chartOptions: ApexOptions = {
     chart: {
       background: "transparent",
-      toolbar: {
-        show: false,
-      },
-      zoom: {
-        enabled: false,
-      },
+      toolbar: { show: false },
+      sparkline: { enabled: true },
+      zoom: { enabled: false },
     },
-    colors: ["#0F3"],
-    dataLabels: {
-      enabled: false,
-    },
-    fill: {
-      opacity: 1,
-    },
+    colors: ["#00FF33"],
+    dataLabels: { enabled: false },
+    fill: { opacity: 1 },
     grid: {
+      padding: { bottom: 0, left: 0, right: 0, top: 8 },
       show: false,
     },
-    stroke: {
-      width: 3,
+    plotOptions: {
+      bar: {
+        borderRadius: 2,
+        columnWidth: "62%",
+      },
     },
-    theme: {
-      mode: theme.palette.mode,
+    states: {
+      normal: { filter: { type: "none", value: 0 } },
     },
-    tooltip: {
-      enabled: false,
-    },
+    theme: { mode: theme.palette.mode },
+    tooltip: { enabled: false },
     xaxis: {
-      labels: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
+      labels: { show: false },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
     },
-    yaxis: {
-      show: false,
-    },
+    yaxis: { show: false },
   };
 
-  const chartSeries = [{ data: [30, 40, 60, 40, 30, 50] }];
+  const chartSeries = [{ data: [18, 24, 37, 29, 48, 63, 42, 72] }];
 
   return (
     <Chart
+      height={height}
       options={chartOptions}
       series={chartSeries}
       type="bar"
-      width={180}
-      height={90}
+      width={width}
     />
   );
 };
