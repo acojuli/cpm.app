@@ -321,6 +321,50 @@ const handleRequest = async (req, res) => {
     return;
   }
 
+  if (path === "/users" && (method === "PATCH" || method === "PUT")) {
+    const user = getSessionUser(req);
+
+    if (!user) {
+      send(res, 401, { error: "No autorizado" });
+      return;
+    }
+
+    const editableFields = ["username", "address", "zip_code"];
+
+    editableFields.forEach((field) => {
+      if (typeof body[field] === "string") {
+        user[field] = body[field].trim();
+      }
+    });
+
+    if (typeof body.email === "string") {
+      const nextEmail = body.email.trim().toLowerCase();
+
+      if (nextEmail && nextEmail !== user.email) {
+        if (users.has(nextEmail)) {
+          send(res, 409, { error: "Ya existe una cuenta con ese email" });
+          return;
+        }
+
+        const previousEmail = user.email;
+        users.delete(previousEmail);
+        user.email = nextEmail;
+        users.set(nextEmail, user);
+
+        sessions.forEach((sessionEmail, token) => {
+          if (sessionEmail === previousEmail) {
+            sessions.set(token, nextEmail);
+          }
+        });
+      }
+    }
+
+    user.updatedAt = now();
+
+    send(res, 200, publicUser(user));
+    return;
+  }
+
   if (path === "/users/verify-email" && method === "POST") {
     const token =
       (typeof url.searchParams.get("token") === "string" &&
