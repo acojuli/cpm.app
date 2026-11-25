@@ -1,10 +1,15 @@
 import React from 'react'
 import Chart from 'src/components/chart'
 
-const Performance = () => {
+interface Props {
+  height?: number;
+  showRanges?: boolean;
+}
+
+const Performance = ({ height, showRanges }: Props) => {
   return (
     <>
-        <Chart />
+        <Chart height={height} showRanges={showRanges} />
     </>
   )
 }

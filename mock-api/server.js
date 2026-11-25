@@ -521,13 +521,45 @@ const handleRequest = async (req, res) => {
   }
 
   if (path === "/funds" && method === "GET") {
-    send(res, 200, []);
+    const composition = [
+      ["Bitcoin", "BTC", 39.97],
+      ["Ethereum", "ETH", 36.08],
+      ["Cosmos", "ATOM", 3.36],
+      ["BUSD", "BUSD", 1.72],
+      ["Chainlink", "LINK", 1.32],
+      ["Polkadot", "DOT", 5.68],
+      ["Thorchain", "RUNE", 1.62],
+      ["Avalanche", "AVAX", 3.01],
+      ["Solana", "SOL", 4.37],
+      ["Binance", "BNB", 2.88],
+    ];
+
+    send(res, 200, [
+      {
+        _id: "651d1716982a77b57c58af97",
+        name: "Foundation",
+        tickets: composition.map(([name, symbol, percent], index) => ({
+          _id: `ticket-${index + 1}`,
+          name,
+          symbol,
+          percent,
+          marketcap: 1000000 * (index + 1),
+          img: `/static/crypto-imgs/crypto-${index + 1}.svg`,
+        })),
+      },
+    ]);
     return;
   }
 
   // Serie diaria para los gráficos de performance.
   if (path.startsWith("/funds/") && path.endsWith("/perform") && method === "GET") {
-    const days = 10;
+    const from = Number(url.searchParams.get("from"));
+    const until = Number(url.searchParams.get("until"));
+    const requestedDays =
+      from && until && until > from
+        ? Math.ceil((until - from) / 86400000) + 1
+        : 10;
+    const days = Math.min(Math.max(requestedDays, 2), 730);
     const today = new Date();
 
     const data = Array.from({ length: days }).map((_, index) => {

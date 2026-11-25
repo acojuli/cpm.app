@@ -1,71 +1,64 @@
-import React from 'react';
-import { TableContainer, Table, TableBody, TableRow, TableCell, Typography } from '@mui/material';
-
-
-
-function createData(
-    title: string,
-    value: string,
-) {
-    return { title, value };
-}
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Typography,
+} from "@mui/material";
 
 const rows = [
-    createData('Categoria', 'FONDO CRIPTO'),
-    createData('Plazo mínimo', 'NO HAY'),
-    createData('Plazo máximo', '99 AÑOS'),
-    createData('Lanzamiento', '17/03/2023'),
-    createData('Suscripciones', 'SEMANAL (MIER 16H ARG)'),
-    createData('Plazo de rescate', '48 HORAS'),
-    createData('Comisión por rescate', '0% / 0.5%'),
-    createData('Comisión por rentabilidad', '0%'),
-    createData('Comisión por administración', '2,75% ANUAL'),
-    createData('Aporte mínimo', '50.000 AR$')
+  { title: "Categoría", value: "FONDO CRIPTO" },
+  { title: "Plazo mínimo", value: "NO HAY" },
+  { title: "Plazo máximo", value: "99 AÑOS" },
+  { title: "Lanzamiento", value: "17/03/2023" },
+  { title: "Suscripciones", value: "SEMANAL (MIER 16H ARG)" },
+  { title: "Plazo de rescate", value: "48 HORAS" },
+  { title: "Comisión por rescate", value: "0% / 0.5%" },
+  { title: "Comisión por rentabilidad", value: "0%" },
+  { title: "Comisión por administración", value: "2,75% ANUAL" },
+  { title: "Aporte mínimo", value: "50.000 AR$" },
 ];
 
 export const Terms = () => {
-    return (
-        <>
-            <Typography
-                variant="h2"
-                mb="16px"
-            >
-                Términos
-            </Typography>
+  return (
+    <>
+      <Typography
+        mb={2}
+        variant="h3"
+      >
+        Términos
+      </Typography>
 
-            <TableContainer
+      <TableContainer
+        sx={{
+          border: "1px solid rgba(245, 250, 255, 0.7)",
+          borderRadius: 2,
+        }}
+      >
+        <Table>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow
+                key={row.title}
                 sx={{
-                    border: "2px #F5FAFF solid",
-                    borderRadius: "18px"
+                  height: 57,
+                  "&:last-child td": { borderBottom: 0 },
                 }}
-            >
-                <Table >
-                    <TableBody>
-                        {rows.map((row) => (
-                            <TableRow
-                                key={row.title}
-                                sx={{
-                                    height: "79.4px"
-                                }}
-                            >
-                                <TableCell
-                                    sx={{
-                                        fontSize: "14px",
-                                        paddingLeft: "48px"
-                                    }}
-                                >
-                                    {row.title}
-                                </TableCell>
-                                <TableCell sx={{
-                                    fontSize: "14px"
-                                }}>
-                                    {row.value}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </>
-    );
-}
+              >
+                <TableCell sx={{ fontSize: 14, pl: 3 }}>{row.title}</TableCell>
+                <TableCell
+                  align="right"
+                  sx={{ color: "text.secondary", fontSize: 13, pr: 3 }}
+                >
+                  {row.value}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
+  );
+};

@@ -4,9 +4,9 @@ import DownloadIcon from '@mui/icons-material/Download';
 
 
 const tableStyle = {
-    border: "thin #F5FAFF solid",
-    borderRadius: "8px",
-    mt: "2rem",
+    border: "1px solid rgba(245, 250, 255, 0.7)",
+    borderRadius: 2,
+    mt: "1.5rem",
     mb: "1rem"
 }
 
@@ -18,14 +18,14 @@ export const Documents = () => {
     return (
         <>
             <Typography
-                variant="h2"
-                mt="2rem"
-                mb="1rem"
+                variant="h3"
+                mb={2}
             >
                 Documentos
             </Typography>
             <Typography
-                variant="subtitle2"
+                color="textSecondary"
+                variant="body2"
             >
                 Los índices CPM están diseñados para proveer a inversores una forma clara, basada en reglas y transparente de obtener el rendimiento de un grupo de criptoactivos.
                 Combinando metodologías y estándares de la industria financiera tradicional, con los ajustes apropiados para adaptarlos al espacio cripto.

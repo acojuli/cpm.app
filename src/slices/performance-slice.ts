@@ -44,12 +44,12 @@ const slice = createSlice({
 
 export const getPerformance = createAsyncThunk(
   "performance/getPerformance",
-  async () => {
+  async (days: number = 9) => {
     try {
       const today = new Date();
-      const nineDaysAgo = new Date(today);
-      nineDaysAgo.setDate(today.getDate() - 9);
-      const from = nineDaysAgo.getTime();
+      const startDate = new Date(today);
+      startDate.setDate(today.getDate() - days);
+      const from = startDate.getTime();
       const until = today.getTime();
       const response = await ApiClient.get(
         `/funds/651d1716982a77b57c58af97/perform?type=daily&from=${from}&until=${until}`
