@@ -41,7 +41,3 @@ export const MainLayout: FC<MainLayoutProps> = ({ children }) => {
     </MainLayoutRoot>
   );
 };
-
-MainLayout.propTypes = {
-  children: PropTypes.node
-};

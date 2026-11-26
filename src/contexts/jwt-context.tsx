@@ -323,7 +323,4 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
   );
 };
 
-AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 export const AuthConsumer = AuthContext.Consumer;

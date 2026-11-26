@@ -64,7 +64,3 @@ export const LoggedLayout: FC<LayoutProps> = ({ children = "CPM", head }) => {
     </MainLayoutRoot>
   );
 };
-
-LoggedLayout.propTypes = {
-  children: PropTypes.node,
-};

@@ -87,8 +87,4 @@ export const SettingsProvider: FC<SettingsProviderProps> = (props) => {
   );
 };
 
-SettingsProvider.propTypes = {
-  children: PropTypes.node.isRequired
-};
-
 export const SettingsConsumer = SettingsContext.Consumer;
