@@ -14,7 +14,7 @@
     "mock": "node mock-api/server.js"
   },
   "engines": {
-    "node": ">=18 <21"
+    "node": "20.x"
   },
   "browserslist": {
     "production": [
