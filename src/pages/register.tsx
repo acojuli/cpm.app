@@ -14,12 +14,12 @@ type Platform = 'Amplify' | 'Auth0' | 'Firebase' | 'JWT';
 const Register: NextPage = () => {
   const router = useRouter();
   const { platform }: { platform: Platform } = useAuth();
-  const { disableGuard } = router.query;
+  const returnUrl = router.query.returnUrl as string | undefined;
 
   return (
     <>
       <Head>
-        <title>Register | Invierte en Cripto</title>
+        <title>Crear cuenta | CPM</title>
       </Head>
       <Box
         component="main"
@@ -27,6 +27,7 @@ const Register: NextPage = () => {
           backgroundColor: 'background.paper',
           display: 'flex',
           flexDirection: 'column',
+          justifyContent: 'center',
           minHeight: '100vh'
         }}
       >
@@ -39,10 +40,11 @@ const Register: NextPage = () => {
           }}
         >
           <Card
-            elevation={16}
+            elevation={0}
             sx={{ 
-                p: 4,
-                backgroundColor:'background.default'
+                backgroundColor:'background.default',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                p: { sm: 5, xs: 3 }
             }}
           >
             <Box
@@ -66,15 +68,17 @@ const Register: NextPage = () => {
                   />
                 </a>
               </NextLink>
-              <Typography variant="h4">
+              <Typography
+                component="h1"
+                sx={{ fontSize: 24, fontWeight: 700, mt: 1 }}
+              >
                 Te damos la bienvenida
               </Typography>
               <Typography
                 color="textSecondary"
-                sx={{ mt: 2 }}
-                variant="body2"
+                sx={{ fontSize: 15, mt: 1 }}
               >
-                Creá tu cuenta
+                Creá tu cuenta para empezar a invertir
               </Typography>
             </Box>
             <Box
@@ -90,20 +94,19 @@ const Register: NextPage = () => {
                 textAlign:'center'
                 }}
             >
-            Ya estas registrado? {' '}
+            ¿Ya tenés cuenta? {' '}
               <NextLink
-                href={
-                  disableGuard
-                    ? `/login?disableGuard=${disableGuard}`
-                    : '/login'
-                }
+                href={{
+                  pathname: '/login',
+                  query: returnUrl ? { returnUrl } : undefined
+                }}
                 passHref
               >
                 <Link
                   color="primary"
                   variant="body2"
                 >
-                  Inicia sesión
+                  Iniciá sesión
                 </Link>
               </NextLink>
             </div>

@@ -5,49 +5,55 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Link } from '@mui/material';
-import { useSelector } from "react-redux";
-import { RootState } from "src/store";
+import { Box, Link } from '@mui/material';
+
 export const AccordionComponent = () => {
-
-  const isMobile = useSelector((state: RootState) => state.mobile.isMobile);
-
-
-  const containerStyle = {
-    marginTop: "1.5rem",
-    borderRadius: 16,
-    border: isMobile ? "1px solid white" : "none",
-  };
-
-  const accordionStyle = {
-    backgroundColor: "transparent",
-    margin: 0,
-  };
-
   return (
-    <div style={containerStyle}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
       {data.map((item) => (
-        <Accordion key={item.id} style={accordionStyle}>
+        <Accordion
+          disableGutters
+          elevation={0}
+          key={item.id}
+          sx={{
+            backgroundColor: 'background.paper',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '12px !important',
+            overflow: 'hidden',
+            '&:before': { display: 'none' },
+            '&.Mui-expanded': {
+              borderColor: 'rgba(0, 255, 51, 0.4)'
+            }
+          }}
+        >
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon style={{ color: "#0f3" }} />}
             aria-controls={`panel${item.id}-content`}
+            expandIcon={<ExpandMoreIcon sx={{ color: 'primary.main' }} />}
             id={`panel${item.id}-header`}
-            style={{ border: "0px solid white"}}
+            sx={{ px: 3, py: 0.5 }}
           >
-            <Typography>{item.title}</Typography>
+            <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+              {item.title}
+            </Typography>
           </AccordionSummary>
-          <AccordionDetails>
-            <Typography>{item.content}
-            {item.link && (
-            <Link href={item.link.url}>
-              {item.link.text}
-            </Link>
-          )}
+          <AccordionDetails sx={{ px: 3, pb: 3, pt: 0 }}>
+            <Typography
+              color="textSecondary"
+              sx={{ fontSize: 15, lineHeight: 1.8 }}
+            >
+              {item.content}
+              {item.link && (
+                <Link
+                  href={item.link.url}
+                  underline="always"
+                >
+                  {item.link.text}
+                </Link>
+              )}
             </Typography>
           </AccordionDetails>
         </Accordion>
       ))}
-
-    </div>
+    </Box>
   );
-}
+};

@@ -1,351 +1,285 @@
 import React, { useState } from "react";
-import { Typography, TextField, Grid, Box, Button, IconButton, Collapse, Alert } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Collapse,
+  Grid,
+  IconButton,
+  InputAdornment,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
 import { useSelector } from "src/store";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import request from "src/services/api-client";
 
-const FormStyle = {
-    leftForm: {
-        width: "500px",
-        marginBottom: "15px",
-        marginTop: "15px"
-    },
-
-    rightForm: {
-        width: "500px",
-        marginBottom: "15px",
-        marginTop: "15px"
-    }
-}
-
-
 interface InputsEnabled {
-    userLabel: boolean;
-    mailLabel: boolean;
-    addressLabel: boolean;
-    zipLabel: boolean;
+  userLabel: boolean;
+  mailLabel: boolean;
+  addressLabel: boolean;
+  zipLabel: boolean;
 }
 
+type EditableField = {
+  key: keyof InputsEnabled;
+  name: "username" | "email" | "address" | "zip_code";
+  label: string;
+  placeholder: string;
+};
+
+const editableFields: EditableField[] = [
+  {
+    key: "userLabel",
+    name: "username",
+    label: "Usuario",
+    placeholder: "Jane Doe",
+  },
+  {
+    key: "mailLabel",
+    name: "email",
+    label: "Email",
+    placeholder: "janedoe@gmail.com",
+  },
+  {
+    key: "addressLabel",
+    name: "address",
+    label: "Domicilio",
+    placeholder: "Avenida San Martin 100",
+  },
+  {
+    key: "zipLabel",
+    name: "zip_code",
+    label: "Código Postal",
+    placeholder: "1722",
+  },
+];
 
 export const MyDataFormDesktop = () => {
-    const { userData } = useSelector((state) => state.user);
-    const { user } = userData;
-    const [loading, setLoading] = useState(false)
-    const [openSucces, setOpenSucces] = useState(false);
-    const [openError, setOpenError] = useState(false);
-    const [disabled, setDisabled] = useState<InputsEnabled>({
-        userLabel: false,
-        mailLabel: false,
-        addressLabel: false,
-        zipLabel: false
-    })
+  const { userData } = useSelector((state) => state.user);
+  const { user } = userData;
+  const [loading, setLoading] = useState(false);
+  const [openSucces, setOpenSucces] = useState(false);
+  const [openError, setOpenError] = useState(false);
+  const [disabled, setDisabled] = useState<InputsEnabled>({
+    userLabel: false,
+    mailLabel: false,
+    addressLabel: false,
+    zipLabel: false,
+  });
 
-    const enabled = (inputName: keyof InputsEnabled) => {
-        setDisabled((prevEnabled) => ({
-            ...prevEnabled,
-            [inputName]: !prevEnabled[inputName],
-        }));
-    };
+  const enabled = (inputName: keyof InputsEnabled) => {
+    setDisabled((prevEnabled) => ({
+      ...prevEnabled,
+      [inputName]: !prevEnabled[inputName],
+    }));
+  };
 
+  const validationSchema = Yup.object({
+    username: Yup.string(),
 
-    const validationSchema = Yup.object({
-        username: Yup.string(),
+    email: Yup.string().email("Debes ingresar un email valido"),
 
-        email: Yup.string()
-            .email("Debes ingresar un email valido"),
+    address: Yup.string(),
 
+    zip_code: Yup.string(),
+  });
 
-        address: Yup.string(),
+  const formik = useFormik({
+    initialValues: {
+      username: user?.username || "",
+      email: user?.email || "",
+      address: user?.address || "",
+      zip_code: user?.zip_code || "",
+    },
+    validationSchema: validationSchema,
 
-        zip_code: Yup.string()
-    });
+    onSubmit: async (values) => {
+      try {
+        setLoading(true);
+        const newData = await request.patch(
+          "/users",
+          JSON.stringify(values, null, 2)
+        );
 
-    const formik = useFormik({
-        initialValues: {
-            username: user?.username,
-            email: user?.email,
-            address: user?.address,
-            zip_code: user?.zip_code
-        },
-        validationSchema: validationSchema,
+        if (newData.status === 200) {
+          setLoading(false);
+          setOpenSucces(true);
+        } else {
+          setLoading(false);
+          setOpenError(true);
+        }
+      } catch (error) {
+        setLoading(false);
+        setOpenError(true);
+      }
+    },
+  });
 
+  const readOnlyFields = [
+    { label: "Nombre", value: user?.full_name },
+    { label: "Nacionalidad", value: user?.country },
+    { label: "CUIL", value: user?.legalId },
+    { label: "Fecha de nacimiento", value: user?.birthday },
+  ];
 
-        onSubmit: async (values) => {
-            try {
-                setLoading(true)
-                const newData = await request.patch("/users", JSON.stringify(values, null, 2))
+  return (
+    <Box sx={{ width: "100%" }}>
+      <Typography variant="h2">Mi cuenta</Typography>
+      <Typography
+        color="textSecondary"
+        sx={{ mt: 0.5 }}
+        variant="h3"
+      >
+        Datos personales
+      </Typography>
 
-                if (newData.status === 200) {
-                    setLoading(false);
-                    setOpenSucces(true);
-                    console.log(newData)
-                } else {
-                    setLoading(false);
-                    setOpenError(true);
-                }
-            } catch (error) {
-                console.log("ERROR=>", error)
-            }
+      <Box sx={{ mt: 2 }}>
+        <Collapse in={openSucces}>
+          <Alert
+            onClose={() => setOpenSucces(false)}
+            severity="success"
+            sx={{
+              backgroundColor: "rgba(0, 255, 51, 0.12)",
+              border: "1px solid #00FF33",
+              mb: 2,
+            }}
+          >
+            Datos guardados.
+          </Alert>
+        </Collapse>
 
-        },
-    });
+        <Collapse in={openError}>
+          <Alert
+            onClose={() => setOpenError(false)}
+            severity="error"
+            sx={{ mb: 2 }}
+          >
+            Oops! Algo salió mal. Por favor intentá más tarde.
+          </Alert>
+        </Collapse>
+      </Box>
 
-    return (
-        <>
-            <Grid
-                container
+      <Box
+        sx={{
+          backgroundColor: "background.paper",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
+          borderRadius: 2,
+          mt: 2,
+          p: { md: 3, xs: 2 },
+          width: "100%",
+        }}
+      >
+        <Grid
+          container
+          spacing={4}
+        >
+          <Grid
+            item
+            md={5}
+            xs={12}
+          >
+            <Typography
+              color="textSecondary"
+              variant="overline"
+            >
+              Datos de la cuenta
+            </Typography>
+            <Stack
+              spacing={2}
+              sx={{ mt: 1 }}
+            >
+              {readOnlyFields.map((field) => (
+                <Box key={field.label}>
+                  <Typography
+                    color="textSecondary"
+                    variant="caption"
+                  >
+                    {field.label}
+                  </Typography>
+                  <Typography variant="body1">
+                    {field.value || "—"}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
+          </Grid>
+
+          <Grid
+            item
+            md={7}
+            xs={12}
+          >
+            <form
+              noValidate
+              onSubmit={formik.handleSubmit}
+            >
+              <Typography
+                color="textSecondary"
+                variant="overline"
+              >
+                Datos editables
+              </Typography>
+              <Stack
                 spacing={2}
-            >
-                <Grid
-                    item
-                    xs={12}
-                >
-                    <Box
-                        sx={{
-                            marginLeft: "20px"
-                        }}
-                    >
-                        <Typography
-                            variant="h1"
-                        >
-                            Mi cuenta
-                        </Typography>
-
-                        <Typography
-                            variant="h4"
-                            style={{
-                                marginTop: "75px",
-                                marginLeft: "5px"
-
-                            }}
-                        >
-                            Datos personales
-                        </Typography>
-                    </Box>
-                </Grid>
-                {/* Alert de enviado correctamente */}
-                <Grid
-                    item
-                    xs={12}
-                >
-                    <Box>
-                        {loading ? (
-                            <Typography
-                                variant="body1"
-                                sx={{ m: { xs: '1.5rem', sm: "1.5rem" } }}
-                            >
-                                Enviando...
-                            </Typography>
-                        ) : (
-                            <Box>
-                                <Collapse in={openSucces}>
-                                    <Alert
-                                        severity="success"
-                                        action={
-                                            <IconButton
-                                                aria-label="close"
-                                                color="inherit"
-                                                onClick={() => {
-                                                    setOpenSucces(false);
-                                                }}
-                                            >
-                                            </IconButton>
-                                        }
-                                        sx={{
-                                            backgroundColor: "rgba(0, 255, 51, 0.2)",
-                                            border: "1px solid #00FF33",
-                                        }}
-                                    >
-                                        <Typography color="inherit">
-                                            Datos guardados.
-                                        </Typography>
-                                    </Alert>
-                                </Collapse>
-                            </Box>
-                        )}
-
-                        {/* Alert de ERROR en el envio */}
-                        {loading ? (
-                            ""
-                        ) : (
-                            <Box>
-                                <Collapse in={openError}>
-                                    <Alert
-                                        severity="error"
-                                        action={
-                                            <IconButton
-                                                aria-label="close"
-                                                color="inherit"
-                                                onClick={() => {
-                                                    setOpenError(false);
-                                                }}
-                                            >
-                                                <CloseIcon
-                                                    style={{
-                                                        backgroundColor: "white",
-                                                        borderRadius: "50%",
-                                                        height: "100%",
-                                                        width: "30px",
-                                                    }}
-                                                />
-                                            </IconButton>
-                                        }
-                                        sx={{
-                                            mb: 2,
-                                        }}
-                                    >
-                                        <Typography color="white">
-                                            Oops! Algo salio mal.
-                                            <br />
-                                            Por favor intenta mas tarde.
-                                        </Typography>
-                                    </Alert>
-                                </Collapse>
-                            </Box>
-                        )}
-                    </Box>
-                </Grid>
-
-            </Grid>
-            <Grid
-                container
-                spacing={5}
-                style={{
-                    border: "1px white solid",
-                    borderRadius: "15px",
-                    marginTop: "50px",
-                    marginLeft: "20px"
-                }}
-            >
-                {/* Datos que el usuario no puede modificar. */}
-                <Grid
-                    item
-                    xs={6}
-                    md={3}
-                >
-                    <Typography>
-                        Nombre
-                    </Typography>
-                    <TextField style={FormStyle.leftForm} value={user?.full_name} disabled />
-
-                    <Typography>
-                        Nacionalidad
-                    </Typography>
-                    <TextField style={FormStyle.leftForm} value={user?.country} disabled />
-
-                    <Typography>
-                        CUIL
-                    </Typography>
-                    <TextField style={FormStyle.leftForm} value={user?.legalId} disabled />
-
-                    <Typography>
-                        Fecha de Nacimiento
-                    </Typography>
-                    <TextField style={FormStyle.leftForm} value={user?.birthday} disabled />
-                </Grid>
-
-                {/* Datos que el usuario puede modificar. */}
-
-                <Grid
-                    item
-                    xs={6}
-                    md={3}
-                    style={{
-                        marginLeft: "250px"
+                sx={{ mt: 1 }}
+              >
+                {editableFields.map((field) => (
+                  <TextField
+                    disabled={!disabled[field.key]}
+                    error={
+                      formik.touched[field.name] &&
+                      Boolean(formik.errors[field.name])
+                    }
+                    fullWidth
+                    helperText={
+                      formik.touched[field.name] && formik.errors[field.name]
+                    }
+                    id={field.name}
+                    key={field.name}
+                    label={field.label}
+                    name={field.name}
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    placeholder={field.placeholder}
+                    InputLabelProps={{ shrink: true }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label={`Editar ${field.label}`}
+                            edge="end"
+                            onClick={() => enabled(field.key)}
+                            size="small"
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
+                    value={formik.values[field.name]}
+                  />
+                ))}
 
-                >
-                    <form
-                        onSubmit={formik.handleSubmit}
-                        noValidate
-                    >
-                        <Typography>
-                            Usuario
-                        </Typography>
-
-                        <TextField
-                            placeholder={user?.username ? user.username : "Jane Doe"}
-                            style={FormStyle.rightForm}
-                            name="username"
-                            id="username"
-                            disabled={!disabled.userLabel}
-                            onChange={formik.handleChange}
-                            error={formik.touched.username && Boolean(formik.errors.username)}
-                            helperText={formik.touched.username && formik.errors.username}
-                            InputProps={{
-                                endAdornment: <Button onClick={() => enabled("userLabel")}><img src="/static/account/pen.svg" style={{ color: "rgba(0,255,51,1" }} /></Button>
-                            }}
-                        />
-
-                        <Typography>
-                            Email
-                        </Typography>
-                        <TextField
-                            placeholder={user?.email ? user.email : "janedoe@gmail.com"}
-                            style={FormStyle.rightForm}
-                            name="email"
-                            id="email"
-                            disabled={!disabled.mailLabel}
-                            onChange={formik.handleChange}
-                            error={formik.touched.email && Boolean(formik.errors.email)}
-                            helperText={formik.touched.email && formik.errors.email}
-                            InputProps={{
-                                endAdornment: <Button onClick={() => enabled("mailLabel")}><img src="/static/account/pen.svg" style={{ color: "rgba(0,255,51,1" }} /></Button>
-                            }}
-
-                        />
-
-                        <Typography>
-                            Domicilio
-                        </Typography>
-                        <TextField
-                            placeholder={user?.address ? user.address : "Avenida San Martin 100"}
-                            style={FormStyle.rightForm}
-                            name="address"
-                            id="address"
-                            disabled={!disabled.addressLabel}
-                            onChange={formik.handleChange}
-                            error={formik.touched.address && Boolean(formik.errors.address)}
-                            helperText={formik.touched.address && formik.errors.address}
-                            InputProps={{
-                                endAdornment: <Button onClick={() => enabled("addressLabel")}><img src="/static/account/pen.svg" style={{ color: "rgba(0,255,51,1" }} /></Button>
-                            }}
-                        />
-
-                        <Typography>
-                            Código Postal
-                        </Typography>
-
-                        <TextField
-                            placeholder={user?.zip_code ? user.zip_code : "1722"}
-                            style={FormStyle.rightForm}
-                            name="zip_code"
-                            id="zip_code"
-                            disabled={!disabled.zipLabel}
-                            onChange={formik.handleChange}
-                            error={formik.touched.zip_code && Boolean(formik.errors.zip_code)}
-                            helperText={formik.touched.zip_code && formik.errors.zip_code}
-                            InputProps={{
-                                endAdornment: <Button onClick={() => enabled("zipLabel")}><img src="/static/account/pen.svg" style={{ color: "rgba(0,255,51,1" }} /></Button>
-                            }}
-                        />
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            sx={{
-                                marginTop: "30px",
-                                marginBottom: "30px",
-                                marginLeft: "200px",
-                                width: "300px"
-                            }}
-                        >
-                            Guardar Cambios
-                        </Button>
-                    </form>
-                </Grid>
-            </Grid>
-        </>
-    )
-}
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Button
+                    disabled={loading}
+                    sx={{ minWidth: { md: 220, xs: "100%" } }}
+                    type="submit"
+                    variant="contained"
+                  >
+                    {loading ? "Guardando..." : "Guardar cambios"}
+                  </Button>
+                </Box>
+              </Stack>
+            </form>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
+  );
+};

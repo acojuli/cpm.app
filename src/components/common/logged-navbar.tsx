@@ -1,185 +1,370 @@
-import React from "react";
-import type { FC } from "react";
+import { useEffect, useState } from "react";
+import type { FC, ReactNode } from "react";
 import NextLink from "next/link";
+import { useRouter } from "next/router";
 import {
   AppBar,
-  Box,
-  Menu,
-  MenuItem,
-  Container,
-  IconButton,
-  Toolbar,
-  MenuList,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  Typography,
   Avatar,
+  Box,
+  Button,
+  Container,
+  Divider,
+  Drawer,
+  IconButton,
+  Link,
+  Stack,
+  Toolbar,
+  Typography,
 } from "@mui/material";
-import { Logo } from "../logo";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import EditIcon from "@mui/icons-material/Edit";
-import HelpIcon from "@mui/icons-material/Help";
-import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
-import LogoutIcon from "@mui/icons-material/Logout";
+import type { Theme } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import LogoutIcon from "@mui/icons-material/Logout";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Logo } from "../logo";
 import { useDispatch, useSelector } from "../../store/index";
-import Link from "next/link";
 import { openLogoutModal } from "src/slices/logout-modal-slice";
-import { styled } from '@mui/material/styles';
 
+interface NavItem {
+  title: string;
+  href: string;
+  icon?: ReactNode;
+}
+
+const siteLinks: NavItem[] = [
+  { title: "Índices", href: "/indice" },
+  { title: "Blog", href: "/blog" },
+  { title: "FAQs", href: "/faqs" },
+  { title: "Términos", href: "/terminos" },
+  { title: "Contacto", href: "/contacto" },
+];
+
+const accountLinks: NavItem[] = [
+  { title: "Portfolio", href: "/dashboard", icon: <BarChartIcon fontSize="small" /> },
+  {
+    title: "Mis datos",
+    href: "/my-data",
+    icon: <AccountCircleIcon fontSize="small" />,
+  },
+  {
+    title: "Mis cuentas",
+    href: "/my-accounts",
+    icon: <AccountBalanceIcon fontSize="small" />,
+  },
+  {
+    title: "Seguridad",
+    href: "/security",
+    icon: <LockOutlinedIcon fontSize="small" />,
+  },
+];
+
+const getInitials = (name?: string): string => {
+  if (!name) {
+    return "CP";
+  }
+
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+
+  return parts.map((part) => part.charAt(0).toUpperCase()).join("");
+};
 
 export const LoggedNavbar: FC = () => {
+  const router = useRouter();
   const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.user);
   const { user } = userData;
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const [open, setOpen] = useState<boolean>(false);
+  const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up("lg"));
 
-  const handleOpenLogoutModal = () => {
+  useEffect(() => {
+    setOpen(false);
+  }, [router.asPath]);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const handleLogout = () => {
+    setOpen(false);
     dispatch(openLogoutModal());
   };
 
-  const LoggedNavBarBox = styled(Box)(({ theme }) => ({
-    [theme.breakpoints.up('lg')]: {
-      display: "none"
-    }
-  }))
+  const isActive = (href: string) => router.pathname === href;
+
   return (
-    <LoggedNavBarBox>
+    <>
       <AppBar
         elevation={0}
         sx={{
           backgroundColor: "background.default",
-          borderBottomColor: "divider",
-          borderBottomStyle: "solid",
-          borderBottomWidth: 0,
-          color: "text.secondary",
+          border: 0,
+          borderRadius: 0,
+          color: "text.primary",
         }}
       >
         <Container maxWidth="xl">
           <Toolbar
             disableGutters
-            sx={{ minHeight: 64 }}
+            sx={{ gap: 1, minHeight: 64 }}
           >
-            <NextLink href="/" passHref>
-              <a>
+            <NextLink
+              href="/dashboard"
+              passHref
+            >
+              <a aria-label="Ir al portfolio">
                 <Logo
                   sx={{
-                    display: {
-                      md: "inline",
-                      xs: "inline",
-                    },
                     height: 60,
                     width: 100,
                   }}
                 />
               </a>
             </NextLink>
+
             <Box sx={{ flexGrow: 1 }} />
-            <IconButton
-              color="primary"
-              onClick={handleMenu}
+
+            <Box
+              component="nav"
+              aria-label="Navegación del sitio"
               sx={{
-                marginRight: -1.5,
+                alignItems: "center",
+                display: { xs: "none", lg: "flex" },
+                gap: 2.5,
+              }}
+            >
+              {siteLinks.map((item) => (
+                <NextLink
+                  href={item.href}
+                  key={item.href}
+                  passHref
+                >
+                  <Link
+                    color="textSecondary"
+                    underline="hover"
+                    variant="subtitle2"
+                  >
+                    {item.title}
+                  </Link>
+                </NextLink>
+              ))}
+            </Box>
+
+            <Button
+              aria-label="Abrir menú de usuario"
+              onClick={handleOpen}
+              sx={{
+                borderRadius: "50%",
+                minWidth: 0,
+                ml: { xs: 0, lg: 1.5 },
+                p: 0.5,
               }}
             >
               <Avatar
-                alt={user?.firstname}
+                alt={user?.full_name}
                 src={user?.avatar}
-                sx={{ width: 24, height: 24 }}
-              />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorReference="anchorPosition"
-              anchorPosition={{ top: 1, left: 900 }}
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-            >
-              <MenuList disabledItemsFocusable>
-                <MenuItem>
-                  <ListItemText>
-                    <Typography variant="h5">¡Hola!</Typography>
-                  </ListItemText>
-                  <ListItemIcon>
-                    <CloseIcon fontSize="small" onClick={handleClose} />
-                  </ListItemIcon>
-                </MenuItem>
-                <Divider />
-                <MenuItem>
-                  <ListItemIcon>
-                    <Avatar alt={user?.firstname} src={user?.avatar} />
-                  </ListItemIcon>
-                  <ListItemText>
-                    <Typography variant="h6">{user?.full_name}</Typography>
-                    <Typography variant="caption">{user?.email}</Typography>
-                  </ListItemText>
-                </MenuItem>
-                <Divider />
-                <Link href="/my-data?tab=0">
-                  <MenuItem>
-                    <ListItemIcon>
-                      <AccountCircleIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Mis datos</ListItemText>
-                  </MenuItem>
-                </Link>
-                <Link href="/my-accounts?tab=1">
-                  <MenuItem>
-                    <ListItemIcon>
-                      <AccountBalanceIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Mis cuentas</ListItemText>
-                  </MenuItem>
-                </Link>
-                <Link href="/security?tab=2">
-                  <MenuItem>
-                    <ListItemIcon>
-                      <LockOutlinedIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Seguridad</ListItemText>
-                  </MenuItem>
-                </Link>
-                <Divider />
-                <MenuItem>
-                  <ListItemIcon>
-                    <EditIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>Blog</ListItemText>
-                </MenuItem>
-                <MenuItem>
-                  <ListItemIcon>
-                    <HelpIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>Ayuda</ListItemText>
-                </MenuItem>
-                <MenuItem>
-                  <ListItemIcon>
-                    <CollectionsBookmarkIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>Términos & condiciones</ListItemText>
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={handleOpenLogoutModal}>
-                  <ListItemIcon>
-                    <LogoutIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>Cerrar sesión</ListItemText>
-                </MenuItem>
-              </MenuList>
-            </Menu>
+                sx={{
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  height: 36,
+                  width: 36,
+                }}
+              >
+                {getInitials(user?.full_name)}
+              </Avatar>
+            </Button>
           </Toolbar>
         </Container>
       </AppBar>
-    </LoggedNavBarBox>
-  )
+
+      <Drawer
+        anchor="right"
+        onClose={handleClose}
+        open={open}
+        ModalProps={{
+          "aria-label": "Menú de usuario",
+          keepMounted: true,
+        }}
+        PaperProps={{
+          sx: {
+            backgroundColor: "background.default",
+            border: 0,
+            borderLeft: { sm: "1px solid rgba(245, 250, 255, 0.15)" },
+            borderRadius: 0,
+            width: { xs: "100%", sm: 400 },
+          },
+        }}
+        sx={{
+          zIndex: (theme) => theme.zIndex.appBar + 100,
+        }}
+        variant="temporary"
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            p: 2,
+          }}
+        >
+          <Box
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography
+              color="textSecondary"
+              variant="overline"
+            >
+              Mi cuenta
+            </Typography>
+            <IconButton
+              aria-label="Cerrar menú"
+              color="primary"
+              onClick={handleClose}
+              size="large"
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          <Box
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              gap: 2,
+              mt: 1,
+            }}
+          >
+            <Avatar
+              alt={user?.full_name}
+              src={user?.avatar}
+              sx={{
+                bgcolor: "primary.main",
+                color: "primary.contrastText",
+                fontSize: 18,
+                fontWeight: 700,
+                height: 56,
+                width: 56,
+              }}
+            >
+              {getInitials(user?.full_name)}
+            </Avatar>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography
+                noWrap
+                variant="h6"
+              >
+                {user?.full_name || "Mi cuenta"}
+              </Typography>
+              <Typography
+                color="textSecondary"
+                noWrap
+                variant="body2"
+              >
+                {user?.email}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Box
+            component="nav"
+            aria-label="Navegación de la cuenta"
+          >
+            <Stack spacing={0.5}>
+              {accountLinks.map((item) => (
+                <NextLink
+                  href={item.href}
+                  key={item.href}
+                  passHref
+                >
+                  <Button
+                    color={isActive(item.href) ? "primary" : "inherit"}
+                    component="a"
+                    href={item.href}
+                    onClick={handleClose}
+                    startIcon={item.icon}
+                    sx={{
+                      backgroundColor: isActive(item.href)
+                        ? "rgba(0, 255, 51, 0.08)"
+                        : "transparent",
+                      justifyContent: "flex-start",
+                      px: 1.5,
+                      py: 1,
+                      textTransform: "none",
+                    }}
+                    variant="text"
+                  >
+                    {item.title}
+                  </Button>
+                </NextLink>
+              ))}
+            </Stack>
+          </Box>
+
+          <Box
+            component="nav"
+            aria-label="Navegación del sitio"
+            sx={{
+              display: { xs: "block", lg: "none" },
+              mt: 2,
+            }}
+          >
+            <Typography
+              color="textSecondary"
+              sx={{ mb: 0.5, px: 1.5 }}
+              variant="overline"
+            >
+              Sitio
+            </Typography>
+            <Stack spacing={0.5}>
+              {siteLinks.map((item) => (
+                <NextLink
+                  href={item.href}
+                  key={item.href}
+                  passHref
+                >
+                  <Button
+                    color="inherit"
+                    component="a"
+                    href={item.href}
+                    onClick={handleClose}
+                    sx={{
+                      justifyContent: "flex-start",
+                      px: 1.5,
+                      py: 1,
+                      textTransform: "none",
+                    }}
+                    variant="text"
+                  >
+                    {item.title}
+                  </Button>
+                </NextLink>
+              ))}
+            </Stack>
+          </Box>
+
+          <Box sx={{ flexGrow: 1 }} />
+
+          <Button
+            fullWidth
+            onClick={handleLogout}
+            size="large"
+            startIcon={<LogoutIcon />}
+            sx={{ justifyContent: "center" }}
+            variant="outlined"
+          >
+            Cerrar sesión
+          </Button>
+        </Box>
+      </Drawer>
+    </>
+  );
 };

@@ -1,105 +1,53 @@
 import {
-  Button,
   FormControl,
   FormControlLabel,
-  FormGroup,
-  FormLabel,
   Grid,
-  Paper,
   Radio,
   RadioGroup,
   Switch,
-  Typography,
 } from "@mui/material";
-import React from "react";
-import { styled } from "@mui/material/styles";
-export const MaterialUISwitch = styled(Switch)(({ theme }) => ({
-  padding: 1,
-  width: 70,
-  height: 30,
-  "& .MuiSwitch-track": {
-    borderRadius: 22,
-    backgroundColor: "#1c1c1c",
+import React, { useState } from "react";
+import { SettingsCard } from "src/components/account/settings-card";
 
-    "&:before, &:after": {
-      content: '""',
-      position: "absolute",
-      top: "65%",
-      transform: "translateY(-50%)",
-      width: 26,
-      height: 26,
-      fontSize: 12,
-    },
-    "&:before": {
-      content: '"OFF"',
-      color: "#1c1c1c",
-      left: 7,
-    },
-    "&:after": {
-      content: '"ON"',
-      color: "#0F3",
-      right: 7,
-    },
-  },
-  "& .MuiSwitch-thumb": {
-    boxShadow: "none",
-    transform: "translateX(10px) !important",
-    width: 20,
-    height: 20,
-    margin: -5,
-  },
-}));
 export const MultiFactorAuth = () => {
+  const [enabled, setEnabled] = useState(false);
+  const [method, setMethod] = useState("email");
+
   return (
-    <Grid container item xs={12} sm={12}>
-      <Grid
-        container
-        item
-        component={Paper}
-        padding={2}
-        direction="row"
-  justifyContent="space-between"
-  alignItems="flex-start"
+    <Grid
+      item
+      xs={12}
+    >
+      <SettingsCard
+        action={
+          <Switch
+            checked={enabled}
+            inputProps={{ "aria-label": "Activar autenticación en dos pasos" }}
+            onChange={(event) => setEnabled(event.target.checked)}
+          />
+        }
+        description="La autenticación de dos factores agrega una instancia de seguridad al inicio de sesión en tu cuenta. Te recomendamos activar esta herramienta para mayor seguridad."
+        title="Autenticación en dos pasos"
       >
-        <Grid item md={8} lg={8}>
-          <Typography variant="h2">Multi factor</Typography>
-          <Typography variant="h2">de autenticación</Typography>
-        </Grid>
-        <Grid item md={2} lg={2} />
-        <Grid item md={2} lg={2}>
-          <FormGroup>
+        <FormControl disabled={!enabled}>
+          <RadioGroup
+            name="auth-type"
+            onChange={(event) => setMethod(event.target.value)}
+            value={method}
+          >
             <FormControlLabel
-              control={<MaterialUISwitch sx={{ m: 1 }} />}
-              label=""
+              control={<Radio />}
+              label="Email"
+              value="email"
             />
-          </FormGroup>
-        </Grid>
-        <Grid item md={8} lg={8}>
-          <Typography variant="body1">
-            La autenticación de dos factores sirve para agregar una instancia de
-            seguridad al inicio de sesión en tu cuenta
-          </Typography>
-          <Typography variant="body1">
-            Te recomendamos activar esta herrmienta para mayor seguridad
-          </Typography>
-        </Grid>
-        <Grid item md={8} lg={8} mt={2}>
-          <FormControl>
-            <RadioGroup name="auth-type">
-              <FormControlLabel
-                value="email"
-                control={<Radio />}
-                label="Email"
-              />
-              <FormControlLabel
-                value="cellphone"
-                control={<Radio />}
-                label="Telefono celular"
-              />
-            </RadioGroup>
-          </FormControl>
-        </Grid>
-      </Grid>
+            <FormControlLabel
+              control={<Radio />}
+              label="Teléfono celular"
+              value="cellphone"
+            />
+          </RadioGroup>
+        </FormControl>
+      </SettingsCard>
     </Grid>
   );
 };

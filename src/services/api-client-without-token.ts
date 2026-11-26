@@ -1,15 +1,10 @@
-import axios from "axios";
+import { apiClient, ApiRequestConfig } from "./api-client";
 
-axios.defaults.baseURL = "https://cpm-tst.onrender.com/api"
+const skipAuth: ApiRequestConfig = { skipAuth: true };
 
 const apiClientWithoutToken = {
-    post: (url: string, body: string) => {
-        return axios.post(url, body)
-    },
-    get: (url: string) => {
-        return axios.get(url)
-    }
+  post: (url: string, body?: unknown) => apiClient.post(url, body, skipAuth),
+  get: (url: string) => apiClient.get(url, skipAuth),
 };
-
 
 export default apiClientWithoutToken;

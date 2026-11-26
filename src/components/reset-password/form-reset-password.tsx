@@ -1,14 +1,14 @@
 import {
     Button,
-    Card,
-    CardContent,
-    CardHeader,
     Grid,
+    Stack,
     TextField,
   } from "@mui/material";
   import * as Yup from "yup";
   import { useFormik } from "formik";
+  import { SettingsCard } from "src/components/account/settings-card";
   import ApiClient from "../../services/api-client";
+  import { toApiError } from "../../services/api-auth";
   import {
     errorNotification,
     succesNotification,
@@ -29,23 +29,21 @@ import {
           .required("Debes ingresar tu correo"),
       }),
       onSubmit: async (values, helpers): Promise<void> => {
-        const json = JSON.stringify(values);
         try {
-          await ApiClient.post("/auth/reset-password", json);
+          await ApiClient.post("/auth/reset-password", {
+            email: values.email,
+          });
           helpers.resetForm();
           dispatch(
             succesNotification({
-              msg: "Recibirás un correo para cambiar tu email",
+              msg: "Si el email está registrado, vas a recibir un correo para reiniciar tu contraseña",
               tab: "security",
             })
           );
         } catch (error) {
-          const msg = error?.response
-            ? error.response.data.error
-            : "Ha ocurrido un error";
           dispatch(
             errorNotification({
-              msg: msg,
+              msg: toApiError(error, "Ha ocurrido un error").message,
               tab: "security",
             })
           );
@@ -53,48 +51,43 @@ import {
       },
     });
     return (
-      <Grid item md={12} xs={12}>
-        <Card>
-          <CardHeader title="Reinicia tu contraseña" />
-          <CardContent style={{ paddingTop: 0 }}>
-            <Grid
-              container
-              direction="column"
-              spacing={2}
-              component="form"
-              onSubmit={formik.handleSubmit}
+      <Grid
+        item
+        md={12}
+        xs={12}
+      >
+        <SettingsCard
+          description="Ingresá el email de tu cuenta y te enviaremos un enlace para crear una nueva contraseña."
+          title="Reiniciá tu contraseña"
+        >
+          <Stack
+            component="form"
+            onSubmit={formik.handleSubmit}
+            spacing={2}
+          >
+            <TextField
+              error={Boolean(formik.touched.email && formik.errors.email)}
+              fullWidth
+              helperText={formik.touched.email && formik.errors.email}
+              label="Email"
+              name="email"
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              placeholder="tu@email.com"
+              type="email"
+              value={formik.values.email}
+            />
+            <Button
+              disabled={formik.isSubmitting}
+              fullWidth
+              size="large"
+              type="submit"
+              variant="contained"
             >
-              <Grid item>
-                <TextField
-                  fullWidth
-                  focused
-                  type="email"
-                  onBlur={formik.handleBlur}
-                  helperText={formik.touched.email && formik.errors.email}
-                  error={Boolean(formik.touched.email && formik.errors.email)}
-                  onChange={formik.handleChange}
-                  value={formik.values.email}
-                  label="Ingresa tu email"
-                  name="email"
-                  placeholder="Ingresa tu email"
-                />
-              </Grid>
-              <Grid item>
-                <Button
-                  fullWidth
-                  type="submit"
-                  disabled={Boolean(
-                    Object.keys(formik.errors).length || formik.isSubmitting
-                  )}
-                  variant="contained"
-                  color="primary"
-                >
-                  Reiniciar contraseña
-                </Button>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
+              {formik.isSubmitting ? "Enviando..." : "Enviar enlace"}
+            </Button>
+          </Stack>
+        </SettingsCard>
       </Grid>
     );
   };

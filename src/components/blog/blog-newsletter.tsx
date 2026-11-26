@@ -1,66 +1,58 @@
 import type { FC } from 'react';
-import { Box, Button, Card, Grid, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 export const BlogNewsletter: FC = () => {
   const theme = useTheme();
 
   return (
-    <Card
-      elevation={16}
+    <Box
       sx={{
-        py: 10,
-        px: 8
+        backgroundColor: 'background.paper',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        borderRadius: 2,
+        overflow: 'hidden',
+        p: { md: 6, xs: 3 }
       }}
     >
       <Grid
         alignItems="center"
         container
         justifyContent="space-between"
-        spacing={3}
-        wrap="nowrap"
+        spacing={4}
       >
         <Grid
           item
-          md={8}
+          md={7}
           xs={12}
         >
-          <Box
-            sx={{
-              alignItems: 'flex-start',
-              display: 'flex',
-              flexDirection: 'column'
-            }}
+          <Typography
+            component="h2"
+            sx={{ fontSize: { md: 28, xs: 22 }, fontWeight: 700 }}
           >
-            <Typography variant="h4">
-              Unite a nuestra lista de mailing
-            </Typography>
-            <Typography
-              color="textSecondary"
-              variant="body2"
-              sx={{
-                mb: 3,
-                mt: 1
-              }}
-            >
-              Subscribite a nuestro newsletter para estar al tanto de las publicaciones.
-            </Typography>
-            <TextField
-              fullWidth
-              label="Correo electronico"
-              name="email"
-              sx={{ flexGrow: 1 }}
-              type="email"
-            />
-            <Button
-              fullWidth
-              size="large"
-              sx={{ mt: 2 }}
-              variant="contained"
-            >
-              Subscribirse
-            </Button>
-          </Box>
+            Unite a nuestra lista de mailing
+          </Typography>
+          <Typography
+            color="textSecondary"
+            sx={{ fontSize: 15, lineHeight: 1.7, mb: 3, mt: 1 }}
+          >
+            Suscribite a nuestro newsletter para estar al tanto de las
+            publicaciones.
+          </Typography>
+          <TextField
+            fullWidth
+            label="Correo electrónico"
+            name="email"
+            type="email"
+          />
+          <Button
+            fullWidth
+            size="large"
+            sx={{ mt: 2 }}
+            variant="contained"
+          >
+            Suscribirse
+          </Button>
         </Grid>
         <Grid
           item
@@ -72,25 +64,13 @@ export const BlogNewsletter: FC = () => {
             }
           }}
         >
-          <Box
-            sx={{
-              position: 'relative',
-              pt: 'calc(421 / 472 * 100%)',
-              '& img': {
-                height: 'auto',
-                position: 'absolute',
-                top: 0,
-                width: '100%'
-              }
-            }}
-          >
-            <img
-              alt=""
-              src={`/static/blog/blog_${theme.palette.mode}.svg`}
-            />
-          </Box>
+          <img
+            alt=""
+            src={`/static/blog/blog_${theme.palette.mode}.svg`}
+            style={{ display: 'block', height: 'auto', width: '100%' }}
+          />
         </Grid>
       </Grid>
-    </Card>
+    </Box>
   );
 };

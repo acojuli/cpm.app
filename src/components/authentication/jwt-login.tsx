@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/use-auth';
 import { useMounted } from '../../hooks/use-mounted';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { getSafeReturnUrl } from 'src/utils/safe-return-url';
 
 export const JWTLogin: FC = (props) => {
   const isMounted = useMounted();
@@ -35,7 +36,7 @@ export const JWTLogin: FC = (props) => {
         await login(values.email, values.password);
 
         if (isMounted()) {
-          const returnUrl = (router.query.returnUrl as string | undefined) || '/dashboard';
+          const returnUrl = getSafeReturnUrl(router.query.returnUrl);
           router.push(returnUrl).catch(console.error);
         }
       } catch (err) {
@@ -103,7 +104,7 @@ export const JWTLogin: FC = (props) => {
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
-                  aria-label="toggle password visibility"
+                  aria-label="Mostrar u ocultar contraseña"
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
                 >
@@ -133,17 +134,17 @@ export const JWTLogin: FC = (props) => {
           checked={formik.values.rememberme}
           name="rememberme"
           onChange={formik.handleChange}/>} 
-          label="Recuerdame" 
+          label="Recordarme" 
         />
           <Link
           sx={{
-            color:'white'
+            color:'primary.main'
           }}
             component="a"
             href="/reset-password"
           >
           <Typography
-            color="white"
+            color="inherit"
             variant="body2"
           >
             Olvidé mi contraseña
@@ -152,7 +153,7 @@ export const JWTLogin: FC = (props) => {
         
       </Box>
       
-      <Box sx={{ mt: 10 }}>
+      <Box sx={{ mt: 3 }}>
         <Button
           disabled={formik.isSubmitting}
           fullWidth

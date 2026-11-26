@@ -1,50 +1,79 @@
 import type { FC } from "react";
 import { Box } from "@mui/system";
-import { Container, Grid } from "@mui/material";
-import { Plan } from "src/types/plan";
-import { HomeCallCard } from "./home-call-to-action-card";
+import { Button, Container, Typography } from "@mui/material";
+import NextLink from "next/link";
 
 export const HomeCallToAction: FC = () => {
-
-    const plans: Plan[] =
-        [
-            {
-                id: "2",
-                description:
-                    "Registrate y empezá a invertir en la industria cripto.",
-                subdescription: "",
-                cover: "/static/home/contact.svg",
-                title: "",
-                informationLink: "",
-                investmentLink: "",
-
-            }
-        ]
-
-    return (
+  return (
+    <Box
+      component="section"
+      sx={{ pt: { xs: 6, md: 10 } }}
+    >
+      <Container maxWidth="lg">
         <Box
-            component="main"
-            sx={{
-                flexGrow: 5,
-            }}
+          sx={{
+            alignItems: "center",
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: { xs: 4, md: 8 },
+          }}
         >
-            <Container
-                maxWidth={false}
-                // maxWidth="lg"
-                style={{
-                    padding: 0
-                }}
+          <Box
+            sx={{
+              flex: 1,
+              textAlign: { xs: "center", md: "left" },
+              width: "100%",
+            }}
+          >
+            <Typography
+              variant="h3"
+              sx={{ fontSize: { xs: "1.7rem", sm: "2rem" } }}
             >
-                <Grid
-                    container
-                    justifyContent="center"
-                    spacing={5}
-                >
-                    {plans.map((plan) => (
-                        <HomeCallCard key={plan.id} plan={plan} />
-                    ))}
-                </Grid>
-            </Container>
+              Registrate e invertí
+            </Typography>
+            <Typography
+              variant="h3"
+              sx={{ fontSize: { xs: "1.7rem", sm: "2rem" }, mb: 3 }}
+            >
+              en la industria cripto
+            </Typography>
+            <NextLink
+              href="/register"
+              passHref
+            >
+              <Button
+                component="a"
+                size="large"
+                variant="contained"
+                sx={{ px: { xs: 4, md: 6 } }}
+              >
+                Invertir
+              </Button>
+            </NextLink>
+          </Box>
+
+          <Box
+            sx={{
+              display: "flex",
+              flex: 1,
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <Box
+              component="img"
+              src="/images/home-cta.svg"
+              alt="Personas invirtiendo en cripto"
+              sx={{
+                display: "block",
+                height: "auto",
+                maxWidth: 560,
+                width: "100%",
+              }}
+            />
+          </Box>
         </Box>
-    );
+      </Container>
+    </Box>
+  );
 };

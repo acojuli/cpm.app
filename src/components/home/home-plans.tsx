@@ -3,105 +3,64 @@ import { Box } from "@mui/system";
 import { Container, Grid, Typography } from "@mui/material";
 import { Plan } from "src/types/plan";
 import { CardPlan } from "./home-card-plan";
-import { useSelector } from "react-redux";
-import { RootState } from "src/store";
 
-export const HomePlans: FC = (props) => {
-  const isMobile = useSelector((state: RootState) => state.mobile.isMobile);
+const plans: Plan[] = [
+  {
+    id: "1",
+    cover: "/static/home/foundation.svg",
+    title: "Foundation",
+    description:
+      "Índice que reúne a las 10 plataformas de contratos inteligentes mas importantes y mejor consolidadas del sector.",
+    subdescription:
+      "Ponderado según la capitalización de mercado y rebalanceado mensualmente.",
+    informationLink: "/indice",
+    investmentLink: "/dashboard",
+  },
+];
 
-  const plans: Plan[] = [
-    {
-      id: "1",
-      cover: "/static/home/foundation.svg",
-      title: "Foundation",
-      description:
-        "Índice que reúne a las 10 plataformas de contratos inteligentes mas importantes y mejor consolidadas del sector.",
-      subdescription: "Ponderado según la capitalización de mercado y rebalanceado mensualmente.",
-      informationLink: "/indice",
-      investmentLink: "/dashboard",
-    },
-  ];
+export const HomePlans: FC = () => {
   return (
-    isMobile ? (
-      <>
-      <Box marginLeft={2}>
-        <Typography align="left"
-          variant="h1">
-          Fondos de
-          inversión cripto
+    <Box
+      component="section"
+      sx={{ py: { xs: 6, md: 8 } }}
+    >
+      <Container maxWidth="lg">
+        <Typography
+          align="left"
+          variant="h2"
+          sx={{ fontSize: { xs: "2.1rem", sm: "2.6rem", md: "3.125rem" } }}
+        >
+          Fondos de inversión cripto
         </Typography>
         <Typography
           align="left"
+          color="textSecondary"
           variant="subtitle2"
-          sx={{ py: 1 }}
+          sx={{
+            letterSpacing: "0.5px",
+            lineHeight: 1.6,
+            maxWidth: 680,
+            mt: 1,
+          }}
         >
-          Basados en Índices con los principales criptoactivos por sector, rebalanceado períodicamente
+          Basados en Índices con los principales criptoactivos por sector,
+          rebalanceado períodicamente
         </Typography>
-        </Box>
-        <Box
-          component="main"
-          marginTop={5}
-          marginLeft={5}
-          sx={{
-            flexGrow: 5,
-          }}
+
+        <Grid
+          container
+          justifyContent="center"
+          spacing={4}
+          sx={{ mt: { xs: 2, md: 4 } }}
         >
-          <Container maxWidth="lg">
-            <Grid
-              container
-              justifyContent="center"
-              spacing={5}
-              padding={2}
-            >
-              {plans.map((plan) => (
-                <CardPlan key={plan.id} plan={plan} />
-              ))}
-            </Grid>
-          </Container>
-        </Box>
-      </>
-    ) : (
-      //desktop
-      <>
-        <Box margin='18rem 0 5rem 7.5rem'>
-          <Typography align="left"
-            variant="h1">
-            Fondos de
-          </Typography>
-          <Typography align="left"
-            variant="h1">
-            inversión cripto
-          </Typography>
-          
-          <Typography
-            align="left"
-            variant="subtitle2"
-            sx={{ py: 1 }}
-          >
-            Basados en Índices con los principales criptoactivos por sector, rebalanceado períodicamente
-          </Typography>
-          </Box>
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 5,
-            flexDirection: "column",
-          }}
-        >
-          <Container maxWidth="lg">
-            <Grid
-              container
-              justifyContent="center"
-              spacing={5}
-              padding={2}
-            >
-              {plans.map((plan) => (
-                <CardPlan key={plan.id} plan={plan} />
-              ))}
-            </Grid>
-          </Container>
-        </Box>
-      </>
-    )
+          {plans.map((plan) => (
+            <CardPlan
+              key={plan.id}
+              plan={plan}
+            />
+          ))}
+        </Grid>
+      </Container>
+    </Box>
   );
 };
