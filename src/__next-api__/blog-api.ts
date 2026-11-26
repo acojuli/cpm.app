@@ -9,7 +9,7 @@ class BlogApi {
       {
         id: '24b76cac9a128cd949747080',
         author: {
-          avatar: '/static/mock-images/avatars/avatar-jie_yan_song.png',
+          avatar: '',
           name: 'Mauricio Luduenia'
         },
         category: 'Criptomonedas',
@@ -22,7 +22,7 @@ class BlogApi {
       {
         id: 'a9c19d0caf2ca91020aacd1f',
         author: {
-          avatar: '/static/mock-images/avatars/avatar-omar_darboe.png',
+          avatar: '',
           name: 'CPM'
         },
         category: 'Criptomonedas',
@@ -37,11 +37,11 @@ class BlogApi {
     return Promise.resolve(posts);
   }
 
-  getPost(): Promise<Post> {
+  private getFullPost(): Promise<Post> {
     const post: Post = {
       id: '24b76cac9a128cd949747080',
       author: {
-        avatar: '/static/mock-images/avatars/avatar-jie_yan_song.png',
+        avatar: '',
         name: 'CPM'
       },
       category: 'Criptomonedas',
@@ -88,6 +88,23 @@ Sin embargo, dos tercios de las personas no bancarizadas cuentan con teléfono m
     };
 
     return Promise.resolve(post);
+  }
+
+  async getPost(id?: string): Promise<Post> {
+    const fullPost = await this.getFullPost();
+
+    if (!id || id === fullPost.id) {
+      return fullPost;
+    }
+
+    const posts = await this.getPosts();
+    const found = posts.find((post) => post.id === id);
+
+    if (!found) {
+      throw new Error('Post no encontrado');
+    }
+
+    return found;
   }
 }
 

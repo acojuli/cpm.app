@@ -3,7 +3,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { Box, Card, Container, Divider, Link, Typography } from '@mui/material';
+import { Box, Card, Container, Divider, Link, Typography, Alert } from '@mui/material';
 import { Logo } from '../components/logo';
 import { useAuth } from '../hooks/use-auth';
 import { JWTLogin } from '../components/authentication/jwt-login';
@@ -14,13 +14,14 @@ type Platform = 'JWT';
 const Login: NextPage = () => {
   const router = useRouter();
   const { platform }: { platform: Platform } = useAuth();
-  const { disableGuard } = router.query;
+  const returnUrl = router.query.returnUrl as string | undefined;
+  const emailVerified = router.query.verified === '1';
 
   return (
     <>
       <Head>
         <title>
-          Login | CPM
+          Iniciar sesión | CPM
         </title>
       </Head>
       <Box
@@ -29,6 +30,7 @@ const Login: NextPage = () => {
           backgroundColor: 'background.paper',
           display: 'flex',
           flexDirection: 'column',
+          justifyContent: 'center',
           minHeight: '100vh'
         }}
       >
@@ -41,10 +43,11 @@ const Login: NextPage = () => {
           }}
         >
           <Card
-            elevation={16}
+            elevation={0}
             sx={{ 
-                p: 4,
-                backgroundColor:'background.default'
+                backgroundColor:'background.default',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                p: { sm: 5, xs: 3 }
             }}
           >
             <Box
@@ -68,16 +71,18 @@ const Login: NextPage = () => {
                   />
                 </a>
               </NextLink>
-              <Typography variant="h4">
+              <Typography
+                component="h1"
+                sx={{ fontSize: 24, fontWeight: 700, mt: 1 }}
+              >
                 Hola de nuevo
               </Typography>
               <Typography
                 color="textSecondary"
-                sx={{ mt: 2 }}
-                variant="body2"
+                sx={{ fontSize: 15, mt: 1 }}
               >
-                  Iniciar sesión
-            </Typography>
+                Iniciá sesión para ver tu portfolio
+              </Typography>
             </Box>
             <Box
               sx={{
@@ -85,6 +90,11 @@ const Login: NextPage = () => {
                 mt: 3
               }}
             >
+              {emailVerified && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                  Email verificado correctamente. Ya podés iniciar sesión.
+                </Alert>
+              )}
               {platform === 'JWT' && <JWTLogin />}
             </Box>
             <div style={{
@@ -92,13 +102,12 @@ const Login: NextPage = () => {
                 textAlign:'center'
                 }}
             >
-            Aún no tenés cuenta? {' '}
+            ¿Aún no tenés cuenta? {' '}
               <NextLink
-                href={
-                  disableGuard
-                    ? `/register?disableGuard=${disableGuard}`
-                    : '/register'
-                }
+                href={{
+                  pathname: '/register',
+                  query: returnUrl ? { returnUrl } : undefined
+                }}
                 passHref
               >
                 <Link

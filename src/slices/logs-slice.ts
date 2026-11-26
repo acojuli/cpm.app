@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
+import ApiClient from "../services/api-client";
 import { AccessLogResponse, AccessLogsState } from "src/types/user-data/logs";
 
 const accessLogsInitialState: AccessLogsState = {
@@ -12,7 +12,7 @@ const accessLogsInitialState: AccessLogsState = {
 export const fetchAccessLogs = createAsyncThunk(
   "accessLogs/fetchAccessLogs",
   async () => {
-    const response = await axios.get("/users/access-log?per_page=100&page=1");
+    const response = await ApiClient.get("/users/access-log?per_page=100&page=1");
     return response.data;
   }
 );
@@ -25,6 +25,7 @@ const accessLogsSlice = createSlice({
     builder
       .addCase(fetchAccessLogs.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(fetchAccessLogs.fulfilled, (state, action: PayloadAction<AccessLogResponse>) => {
         state.accessLogs = action.payload;

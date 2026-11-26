@@ -7,6 +7,7 @@ import { reducer as transactionsReducer } from "../slices/transactions-slice";
 import { reducer as mobileReducer } from "../slices/mobile-slice";
 import { reducer as performanceReducer } from "../slices/performance-slice";
 import { reducer as accessLogsReducer } from "../slices/logs-slice";
+import { reducer as currencyReducer } from "../slices/currency-slice";
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -16,5 +17,6 @@ export const rootReducer = combineReducers({
   transactions: transactionsReducer,
   mobile: mobileReducer,
   performance: performanceReducer,
-  accessLogs: accessLogsReducer
+  accessLogs: accessLogsReducer,
+  currency: currencyReducer,
 });

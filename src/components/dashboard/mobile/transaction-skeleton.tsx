@@ -1,40 +1,33 @@
-import {
-  Chip,
-  Divider,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Skeleton,
-} from "@mui/material";
-import React from "react";
+import { Box, Skeleton } from "@mui/material";
 
-export const TransactionSkeleton = () => {
-  return (
-    <>
-      <ListItem>
-        <ListItemText
-          primary={<Skeleton variant="text" sx={{ width: 75, height: 20 }} />}
-          secondary={<Skeleton variant="text" sx={{ width: 75, height: 20 }} />}
-        />
-        <ListItemText
-          primary={<Skeleton variant="text" sx={{ width: 75, height: 20 }} />}
-          secondary={
-            <Skeleton variant="text" sx={{ fontSize: "1.8rem", width: 75 }} />
-          }
-          primaryTypographyProps={{
-            color: "darkorchid",
-          }}
-        />
-        <ListItemIcon>
-          <Chip
-            label={
-              <Skeleton variant="text" sx={{ fontSize: "2rem", width: 75 }} />
-            }
-            color="default"
-          />
-        </ListItemIcon>
-      </ListItem>
-      <Divider />
-    </>
-  );
-};
+export const TransactionSkeleton = () => (
+  <Box
+    sx={{
+      alignItems: "center",
+      backgroundColor: "background.paper",
+      display: "grid",
+      gap: 1,
+      gridTemplateColumns: "1fr 1fr 76px",
+      minHeight: 76,
+      px: 1.5,
+      py: 1.25,
+      "&:not(:last-child)": {
+        borderBottom: "1px solid rgba(255,255,255,0.08)",
+      },
+    }}
+  >
+    <Box>
+      <Skeleton height={18} width={70} />
+      <Skeleton height={15} width={58} />
+    </Box>
+    <Box>
+      <Skeleton height={18} width={72} />
+      <Skeleton height={15} width={54} />
+    </Box>
+    <Skeleton
+      height={28}
+      variant="rectangular"
+      width={72}
+    />
+  </Box>
+);

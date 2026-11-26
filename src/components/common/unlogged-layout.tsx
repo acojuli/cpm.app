@@ -1,7 +1,5 @@
 import { FC, useState } from "react";
 import PropTypes from "prop-types";
-import { LoggedNavbar } from "./logged-navbar";
-import { LoggedNavbarDesktop } from "./logged-navbar-desktop";
 import Head from "next/head";
 import { ConfirmationLogoutModal } from "../logout";
 import { ModalMyInfo } from "../account/mobile/my-data";
@@ -21,8 +19,6 @@ export const UnloggedLayout: FC<LayoutProps> = ({ children = "CPM", head }) => {
     dispatch(closeLogoutModal());
   };
 
-  const [openUserMenu, setOpenUserMenu] = useState<boolean>(false);
-
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   const handleOpenSideBar = () => {
@@ -33,17 +29,11 @@ export const UnloggedLayout: FC<LayoutProps> = ({ children = "CPM", head }) => {
       <Head>
         <title>{head}</title>
       </Head>
-      <LoggedNavbarDesktop
-        onClose={(): void => setOpenUserMenu(false)}
-        onOpenUserMenu={handleOpenSideBar}
-        open={openUserMenu}
-      />
       <MainSidebar
         onClose={(): void => setIsSidebarOpen(false)}
         open={isSidebarOpen}
       />
       <MainNavbar onOpenSidebar={handleOpenSideBar} />
-      <LoggedNavbar />
       <Container maxWidth="xl" sx={{ mt: 2, mb: 8 }}>
         {children}
       </Container>

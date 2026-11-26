@@ -10,8 +10,6 @@ import Performance from "../performance";
 import { Documents } from "./documents";
 import { Footer } from "src/components/footer";
 import apiClientWithoutToken from "src/services/api-client-without-token";
-import { CompositionSkeleton } from "./compositionSkeleton";
-import { TermsSkeleton } from "./termsSkeleton";
 import { Ticket } from "../types";
 
 export const DesktopIndices = () => {
@@ -27,10 +25,12 @@ export const DesktopIndices = () => {
     const fetchData = async () => {
       try {
         const result = await apiClientWithoutToken.get("/funds");
-        setCompositionData(result.data[0].tickets);
-        setIsCompositionLoading(false);
+        setCompositionData(result.data?.[0]?.tickets || []);
       } catch (error) {
         console.log("ERROR=>", error);
+        setCompositionData([]);
+      } finally {
+        setIsCompositionLoading(false);
       }
     };
 
@@ -43,88 +43,114 @@ export const DesktopIndices = () => {
         <title>CPM | Indices</title>
       </Head>
 
-      <Box component="main" sx={{ py: 8 }}>
-        <Container>
+      <Box component="main" sx={{ pb: 8, pt: 10 }}>
+        <Container maxWidth="lg">
           <MainNavbar onOpenSidebar={handleOpenSideBar} />
           <MainSidebar
             onClose={(): void => setIsSidebarOpen(false)}
             open={isSidebarOpen}
           />
-          <Typography variant="h1" textAlign="center" mt="2rem" mb="1rem">
-            Índice Foundation
-          </Typography>
-          <Typography
-            variant="h2"
-            textAlign="center"
-            sx={{
-              mb: "4rem",
-            }}
-          >
-            Fondo de inversión en proyectos de plataformas de contratos
-            inteligentes seleccionados de manera diversificada
-          </Typography>
-          <Button
-            href="/login"
-            variant="contained"
-            sx={{
-              position: "relative",
-              ml: "40%",
-              mb: "6rem",
-              width: "15rem",
-              height: "3rem",
-            }}
-          >
-            Invertir
-          </Button>
 
-          <Typography variant="subtitle2" mb="0.5rem">
+          <Box sx={{ mx: "auto", maxWidth: 760, textAlign: "center" }}>
+            <Typography
+              mb={2}
+              variant="h1"
+            >
+              Índice Foundation
+            </Typography>
+            <Typography
+              color="textSecondary"
+              variant="subtitle1"
+            >
+              Fondo de inversión en proyectos de plataformas de contratos
+              inteligentes seleccionados de manera diversificada.
+            </Typography>
+            <Button
+              component="a"
+              href="/login"
+              sx={{ mb: 8, mt: 4, minWidth: 200 }}
+              variant="contained"
+            >
+              Invertir
+            </Button>
+          </Box>
+
+          <Typography
+            color="textSecondary"
+            mb={1}
+            variant="body2"
+          >
             La novedad del mercado cripto presenta desafíos a la hora de evaluar
             y elegir proyectos particulares para invertir.
           </Typography>
 
-          <Typography variant="subtitle2" mb="6rem">
-            A través de los
-            fondos, que replican los índices CPM, se facilita a los inversores
-            el proceso de decisión de inversión
+          <Typography
+            color="textSecondary"
+            mb={8}
+            variant="body2"
+          >
+            A través de los fondos, que replican los índices CPM, se facilita a
+            los inversores el proceso de decisión de inversión.
           </Typography>
 
-          <Box>
-            <Grid container spacing={4}>
-              <Grid item xs={6}>
-                {isCompositionLoading ? (
-                  <CompositionSkeleton />
-                ) : (
-                  <Composition composition={compositionData} />
-                )}
-              </Grid>
-              <Grid item xs={6}>
-              {isCompositionLoading ? (
-                  <TermsSkeleton />
-                ) : (
-                  <Terms />
-                )}              </Grid>
+          <Grid
+            container
+            spacing={4}
+          >
+            <Grid
+              item
+              md={6}
+              xs={12}
+            >
+              <Composition
+                composition={compositionData}
+                loading={isCompositionLoading}
+              />
             </Grid>
-          </Box>
+            <Grid
+              item
+              md={6}
+              xs={12}
+            >
+              <Terms />
+            </Grid>
+          </Grid>
 
-          <Box mt="2rem">
-            <Typography variant="h2" mb="3rem">
+          <Box mt={8}>
+            <Typography
+              mb={3}
+              variant="h3"
+            >
               Rendimiento
             </Typography>
-            <Performance />
+            <Performance
+              height={320}
+              showRanges
+            />
           </Box>
 
-          <Box>
-            <Typography variant="h2" mt="2rem" mb="1rem">
+          <Box mt={8}>
+            <Typography
+              mb={2}
+              variant="h3"
+            >
               Objetivo y estrategia
             </Typography>
-            <Typography variant="subtitle2">
+            <Typography
+              color="textSecondary"
+              mb={1}
+              variant="body2"
+            >
               Capitalizar el crecimiento de la industria y la adopción masiva de
               la tecnología blockchain invirtiendo de manera temprana en
               proyectos con potencial de servir como infraestructura para la
               era del internet del dinero.
             </Typography>
 
-            <Typography variant="subtitle2">
+            <Typography
+              color="textSecondary"
+              variant="body2"
+            >
               Para ver las metodologías aplicadas en el índice Foundation,{" "}
               <NextLink href={"/static/documents/metodologia-indice-foundation.pdf"} passHref>
                 <Link underline="always">hacé click aquí.</Link>
@@ -132,7 +158,7 @@ export const DesktopIndices = () => {
             </Typography>
           </Box>
 
-          <Box>
+          <Box mt={8}>
             <Documents />
           </Box>
         </Container>

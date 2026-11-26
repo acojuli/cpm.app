@@ -10,7 +10,11 @@
     "export": "next export",
     "build-export": "next build && next export",
     "lint": "next lint",
-    "lint-fix": "next lint --fix"
+    "lint-fix": "next lint --fix",
+    "mock": "node mock-api/server.js"
+  },
+  "engines": {
+    "node": ">=18 <21"
   },
   "browserslist": {
     "production": [

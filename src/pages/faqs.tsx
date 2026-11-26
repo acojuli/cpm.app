@@ -1,4 +1,4 @@
-import { Container, Typography, useTheme } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -8,63 +8,76 @@ import { useState } from "react";
 import { MainSidebar } from "src/components/main-sidebar";
 import Link from "next/link";
 import GoBack from "src/components/widgets/goBack";
+import { Footer } from "src/components/footer";
 
 const Faqs: NextPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const theme = useTheme();
-
 
   const handleOpenSideBar = () => {
-    setIsSidebarOpen(!isSidebarOpen)
-}
+    setIsSidebarOpen(!isSidebarOpen);
+  };
   return (
     <>
       <Head>
-        <title>CPM | Inversiones Cripto</title>
+        <title>CPM | Preguntas frecuentes</title>
       </Head>
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          pt: 8,
+          pb: 10,
+          pt: 10,
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth="md">
           <MainNavbar onOpenSidebar={handleOpenSideBar} />
           <MainSidebar
             onClose={(): void => setIsSidebarOpen(false)}
             open={isSidebarOpen}
           />
-          <Box sx={{
-            mt: 3,
-            mb: "2rem",
-            display: "flex",
-            flexDirection: "column",
-            [theme.breakpoints.up('md')]: {
-              alignItems: "center",
-              mt: 6,
-              mb: "4rem",
-              justifyContent: "center",
-            },
-          }}>
-            <Typography variant="h1" sx={{ mt: 3, mb: "2rem" }}>
-              <GoBack/>
+          <Box sx={{ mb: { md: 6, xs: 4 }, mt: { md: 4, xs: 1 } }}>
+            <Typography
+              color="primary"
+              variant="overline"
+            >
+              Ayuda
+            </Typography>
+            <Typography
+              component="h1"
+              sx={{
+                alignItems: "center",
+                display: "flex",
+                fontSize: { md: 44, xs: 30 },
+                fontWeight: 700,
+                lineHeight: 1.15,
+                mb: 2,
+                mt: 0.5,
+              }}
+            >
+              <GoBack />
               Preguntas frecuentes
             </Typography>
-            <Typography color="textSecondary" variant="subtitle1">
-            Consultá las dudas más frecuentes de nuestros usuarios.
-            </Typography>
-            <Typography color="textSecondary" variant="subtitle1">
-              Si no encontrás lo que estás buscando,{' '}
-              <Link href="/contacto">
-                <a style={{ color: "#0f3"}}>contactanos</a>
+            <Typography
+              color="textSecondary"
+              sx={{ fontSize: 17, lineHeight: 1.7 }}
+            >
+              Consultá las dudas más frecuentes de nuestros usuarios. Si no
+              encontrás lo que estás buscando,{" "}
+              <Link
+                href="/contacto"
+                passHref
+              >
+                <a style={{ color: "#0f3", textDecoration: "underline" }}>
+                  contactanos
+                </a>
               </Link>
               .
             </Typography>
           </Box>
-          <AccordionComponent /> 
+          <AccordionComponent />
         </Container>
       </Box>
+      <Footer />
     </>
   );
 };

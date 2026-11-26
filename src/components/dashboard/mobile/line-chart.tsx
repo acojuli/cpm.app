@@ -1,65 +1,38 @@
-import { useTheme } from "@mui/material/styles";
-import type { ApexOptions } from "apexcharts";
-import { FC } from "react";
-import { Chart } from "./chart";
+import { Box } from "@mui/material";
 
-export const LineChart: FC = () => {
-  const theme = useTheme();
+interface Props {
+  height?: number | string;
+  width?: number | string;
+}
 
-  const chartOptions: ApexOptions = {
-    chart: {
-      background: "transparent",
-      toolbar: {
-        show: false,
-      },
-      zoom: {
-        enabled: false,
-      },
-    },
-    colors: ["#0F3"],
-    dataLabels: {
-      enabled: false,
-    },
-    fill: {
-      opacity: 1,
-    },
-    grid: {
-      show: false,
-    },
-    stroke: {
-      width: 3,
-    },
-    theme: {
-      mode: theme.palette.mode,
-    },
-    tooltip: {
-      enabled: false,
-    },
-    xaxis: {
-      labels: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-    },
-    yaxis: {
-      show: false,
-    },
-  };
+const values = [18, 24, 37, 29, 48, 63, 42, 72];
+const maxValue = Math.max(...values);
 
-  const chartSeries = [{ data: [30, 40, 60, 40, 30, 50] }];
-
-  return (
-    <Chart
-      options={chartOptions}
-      series={chartSeries}
-      type="bar"
-      width={180}
-      height={90}
-    />
-  );
-};
+export const LineChart = ({ height = 90, width = 180 }: Props) => (
+  <Box
+    aria-label="Evolución del balance"
+    role="img"
+    sx={{
+      alignItems: "flex-end",
+      display: "flex",
+      gap: "6%",
+      height,
+      overflow: "hidden",
+      width,
+    }}
+  >
+    {values.map((value, index) => (
+      <Box
+        key={`${value}-${index}`}
+        sx={{
+          backgroundColor: "primary.main",
+          borderRadius: "3px 3px 0 0",
+          flex: 1,
+          height: `${(value / maxValue) * 100}%`,
+          minWidth: 3,
+          opacity: index === values.length - 1 ? 1 : 0.82,
+        }}
+      />
+    ))}
+  </Box>
+);

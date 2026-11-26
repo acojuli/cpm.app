@@ -1,165 +1,186 @@
 import {
   Avatar,
+  Box,
+  Button,
   Divider,
-  Grid,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  MenuList,
+  Stack,
   Typography,
 } from "@mui/material";
 import React, { FC } from "react";
+import { useRouter } from "next/router";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useDispatch, useSelector } from "src/store";
-import OutputIcon from "@mui/icons-material/Output";
-import { styled } from "@mui/system";
 import { NavigationItem as NavigationItemType } from "src/types/left-bar";
 import { openLogoutModal } from "src/slices/logout-modal-slice";
 import { NavigationItem } from "./navigation-item";
+
 interface Props {
   navigationList?: NavigationItemType[];
   showUser?: boolean;
   showIcons?: boolean;
 }
+
 const navigationDefaultList: NavigationItemType[] = [
   {
     icon: "bar_chart",
     text: "Portfolio",
-    to: "dashboard",
+    to: "/dashboard",
   },
   {
     icon: "account_circle",
     text: "Mis datos",
-    to: "my-data",
+    to: "/my-data",
   },
   {
     icon: "account_balance",
     text: "Mis cuentas",
-    to: "my-accounts",
+    to: "/my-accounts",
   },
   {
     icon: "lock",
     text: "Seguridad",
-    to: "security",
+    to: "/security",
   },
 ];
+
+const getInitials = (name?: string): string => {
+  if (!name) {
+    return "CP";
+  }
+
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+};
+
 export const LeftBar: FC<Props> = ({
   navigationList = navigationDefaultList,
   showUser = false,
   showIcons = false,
 }) => {
+  const router = useRouter();
   const { userData } = useSelector((state) => state.user);
   const { user } = userData;
   const dispatch = useDispatch();
+
   const handleOpenLogoutModal = () => {
     dispatch(openLogoutModal());
   };
 
+  const isActive = (to: string) => {
+    const href = to.startsWith("/") ? to : `/${to}`;
+
+    if (href.includes("#")) {
+      return router.asPath === href;
+    }
+
+    return router.pathname === href;
+  };
+
   return (
-    <Grid
-      container
-      direction="row"
-      justifyContent="flex-start"
-      alignItems="flex-start"
-      rowSpacing={1}
-      item
-      md={12}
-      lg={12}
+    <Box
+      sx={{
+        alignSelf: "flex-start",
+        display: "flex",
+        flexDirection: "column",
+        gap: 1.5,
+        position: { md: "sticky" },
+        top: { md: 80 },
+        width: "100%",
+      }}
     >
       {showUser && (
-        <Grid
-          item
-          md={12}
-          lg={12}
-          container
-          direction="column"
-          justifyContent="center"
-          alignItems="center"
-          rowSpacing={5}
-          marginTop={3}
+        <Box
           sx={{
-            backgroundColor: "#DADADA",
-            borderTopLeftRadius: '.8rem',
-            borderTopRightRadius: '.8rem',
-          }}        >
-          <Grid
-            item md={12}
-            lg={12}
-            sm={12}
+            alignItems: "center",
+            backgroundColor: "background.paper",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            borderRadius: 2,
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.5,
+            p: 2,
+            textAlign: "center",
+          }}
+        >
+          <Avatar
+            alt={user?.full_name}
+            src={user?.avatar}
+            sx={{
+              bgcolor: "primary.main",
+              color: "primary.contrastText",
+              fontSize: 24,
+              fontWeight: 700,
+              height: 72,
+              width: 72,
+            }}
           >
-            <Avatar
-              alt={user?.firstname}
-              src={user?.avatar}
-              sx={{ width: 100, height: 100, border: "3px solid black" }}
-            />
-          </Grid>
-          <Grid
-            item
-            md={12}
-            lg={12}
+            {getInitials(user?.full_name)}
+          </Avatar>
+          <Typography
+            noWrap
+            sx={{ maxWidth: "100%" }}
+            variant="subtitle1"
           >
-            <Typography
-              variant="h3"
-              textAlign="center"
-              color="black"
-            >
-              {user?.full_name}
-            </Typography>
-          </Grid>
-          <Divider sx={{ width: '100%', bgcolor: 'grey.500', my: 1 }} />
-        </Grid>
+            {user?.full_name || "Mi cuenta"}
+          </Typography>
+          <Typography
+            color="textSecondary"
+            noWrap
+            sx={{ maxWidth: "100%" }}
+            variant="caption"
+          >
+            {user?.email}
+          </Typography>
+        </Box>
       )}
-      <Grid
-        item
-        xs={12}
-        sm={12}
-        md={12}
-        lg={12}
-        container
-        direction="column"
-        justifyContent="space-between"
-        alignItems="stretch"
+
+      <Box
         sx={{
-          backgroundColor: "#DADADA",
-          borderBottomLeftRadius: '.5rem',
-          borderBottomRightRadius: '.5rem',
-          height: `${showUser ? 55 : 80}vh`,
+          backgroundColor: "background.paper",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
+          borderRadius: 2,
+          p: 1,
         }}
       >
-        <StyledMenu>
-          {navigationList.map((item) => {
-            const active = window.location.pathname.includes(item.to);
-            return (
-              <NavigationItem
-                key={item.to}
-                active={active}
-                navigationItem={item}
-                showIcons={showIcons}
-              />
-            );
-          })}
-        </StyledMenu>
-        <StyledMenu sx={{ position: "relative", bottom: 0 }}>
-          <MenuItem onClick={handleOpenLogoutModal}>
-            <ListItemIcon>
-              <OutputIcon />
-            </ListItemIcon>
-            <ListItemText>
-              <Typography variant="subtitle1">Cerrar sesión</Typography>
-            </ListItemText>
-          </MenuItem>
-        </StyledMenu>
-      </Grid>
-    </Grid>
+        <Stack
+          component="nav"
+          aria-label="Navegación de la cuenta"
+          spacing={0.5}
+        >
+          {navigationList.map((item) => (
+            <NavigationItem
+              active={isActive(item.to)}
+              key={item.to}
+              navigationItem={item}
+              showIcons={showIcons}
+            />
+          ))}
+        </Stack>
+
+        {showUser && (
+          <>
+            <Divider sx={{ my: 1 }} />
+            <Button
+              fullWidth
+              onClick={handleOpenLogoutModal}
+              startIcon={<LogoutIcon fontSize="small" />}
+              sx={{
+                justifyContent: "flex-start",
+                px: 1.5,
+                py: 1,
+                textTransform: "none",
+              }}
+              variant="text"
+            >
+              Cerrar sesión
+            </Button>
+          </>
+        )}
+      </Box>
+    </Box>
   );
 };
-
-const StyledMenu = styled(MenuList)({
-  color: "black",
-  paddingBottom: 20,
-  paddingTop: 5,
-  "& > li": {
-    "& > div": {
-      color: "inherit",
-    },
-  },
-});
