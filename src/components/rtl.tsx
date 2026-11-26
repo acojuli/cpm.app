@@ -35,8 +35,3 @@ export const RTL: FC<RTLProps> = (props) => {
 
   return <>{children}</>;
 };
-
-RTL.propTypes = {
-  children: PropTypes.node.isRequired,
-  direction: PropTypes.oneOf<Direction>(['ltr', 'rtl'])
-};

@@ -44,7 +44,3 @@ export const UnloggedLayout: FC<LayoutProps> = ({ children = "CPM", head }) => {
     </LayoutRoot>
   );
 };
-
-UnloggedLayout.propTypes = {
-  children: PropTypes.node,
-};

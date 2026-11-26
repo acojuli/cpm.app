@@ -1,7 +1,8 @@
 import { Grid, Modal, Box, useMediaQuery, useTheme } from "@mui/material";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 
 interface Props {
+  children?: ReactNode;
   open: boolean;
   handleClose: () => void;
 }
