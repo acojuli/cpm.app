@@ -2,10 +2,15 @@
  * URL base de la API. Debe incluir el prefijo `/api`.
  *
  * En desarrollo local apunta al mock incluido en el repo (`npm run mock`).
- * Se puede sobreescribir con `NEXT_PUBLIC_API_URL` en `.env.local`.
+ * En producción usa el backend desplegado, y permite sobreescribirlo desde
+ * `VITE_API_URL` o `NEXT_PUBLIC_API_URL`.
  */
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.VITE_API_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://cpm-api-production.up.railway.app/api"
+    : "http://localhost:4000/api");
 
 /** Nombre del header que espera la API para el token de sesión. */
 export const AUTH_HEADER = "cpm_user_app_token";
