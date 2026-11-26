@@ -17,13 +17,11 @@ import NextLink from "next/link";
 import { format } from "date-fns";
 import { getInitials } from "src/utils/get-initials";
 import type { Post } from "src/types/blog";
-import SwipeableViews from "react-swipeable-views";
-import { useTheme } from "@mui/material/styles";
+import SwipeableViews from "./swipeable-views";
 
 const POSTS_PER_SLIDE = 3;
 
 export const Carousel: FC<{ posts: Post[] }> = ({ posts }) => {
-  const theme = useTheme();
   const postsInfinito = [...posts, ...posts, ...posts];
   const [activeIndex, setActiveIndex] = useState(0);
   const totalSlides = Math.max(
@@ -66,10 +64,8 @@ export const Carousel: FC<{ posts: Post[] }> = ({ posts }) => {
 
       <Box sx={{ minWidth: 0, flex: 1 }}>
         <SwipeableViews
-          axis={theme.direction === "rtl" ? "x-reverse" : "x"}
           index={activeIndex}
           onChangeIndex={handleChangeIndex}
-          enableMouseEvents
         >
           {Array.from({ length: totalSlides }).map((_, index) => {
             const startIndex = index * POSTS_PER_SLIDE;
