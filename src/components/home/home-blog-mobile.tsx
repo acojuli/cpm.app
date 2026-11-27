@@ -1,11 +1,7 @@
 import { useState } from "react";
-import { useTheme } from "@mui/material/styles";
 import { Avatar, Box, Card, Container, Typography } from "@mui/material";
-import SwipeableViews from "react-swipeable-views";
-import { autoPlay } from "react-swipeable-views-utils";
+import SwipeableViews from "../swipeable-views";
 import { getInitials } from "src/utils/get-initials";
-
-const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
 const images = [
   {
@@ -31,7 +27,6 @@ const images = [
 ];
 
 export const HomeBlogMobile = () => {
-  const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
 
   const handleStepChange = (step: number) => {
@@ -75,11 +70,9 @@ export const HomeBlogMobile = () => {
             overflow: "hidden",
           }}
         >
-          <AutoPlaySwipeableViews
-            axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+          <SwipeableViews
             index={activeStep}
             onChangeIndex={handleStepChange}
-            enableMouseEvents
             interval={5000}
             slideStyle={{ width: "100%" }}
           >
@@ -98,7 +91,7 @@ export const HomeBlogMobile = () => {
                 />
               </div>
             ))}
-          </AutoPlaySwipeableViews>
+          </SwipeableViews>
 
           <Box sx={{ p: { xs: 2, sm: 3 } }}>
             <Typography variant="h5">{images[activeStep].title}</Typography>

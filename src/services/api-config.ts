@@ -2,14 +2,13 @@
  * URL base de la API. Debe incluir el prefijo `/api`.
  *
  * En desarrollo local apunta al mock incluido en el repo (`npm run mock`).
- * En producción usa el backend desplegado, y permite sobreescribirlo desde
- * `VITE_API_URL` o `NEXT_PUBLIC_API_URL`.
+ * En producción usa el backend público desplegado. Next.js inyecta
+ * `NEXT_PUBLIC_API_URL` en el cliente durante el build.
  */
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  process.env.VITE_API_URL ||
   (process.env.NODE_ENV === "production"
-    ? "https://cpm-api-production.up.railway.app/api"
+    ? "https://api.cpm.trading/api"
     : "http://localhost:4000/api");
 
 /** Nombre del header que espera la API para el token de sesión. */

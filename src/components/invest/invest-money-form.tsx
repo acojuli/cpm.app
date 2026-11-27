@@ -16,7 +16,7 @@ import {
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import ApiClient from "../../services/api-client";
-import { useDispatch } from "react-redux";
+import { useDispatch } from "src/store";
 import {
   errorNotification,
   succesNotification,
