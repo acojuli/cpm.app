@@ -6,7 +6,6 @@ module.exports = {
     workerThreads: false
   },
   env: {
-    VITE_API_URL: process.env.VITE_API_URL,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL
   },
   webpack(config) {
